@@ -735,6 +735,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
     qs('#copyLink').addEventListener('click', ()=>{ navigator.clipboard.writeText(window.location.href).then(()=> toast('Link copied')); track('Receipt Link Copied'); });
   }
 
-  // state lab everywhere
-  stateLabInit();
+  // state lab only on app-like pages (hide on marketing/landing variants)
+  if(!document.body.classList.contains('landing-variant')){
+    stateLabInit();
+  }
 });
