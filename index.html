@@ -23,7 +23,7 @@
         <p class="sub">It finds <span class="typewriter"></span> under your rules—just like Maya's growth agent.</p>
         <div class="cta">
           <a class="btn primary" href="onboarding.html">Turn on your agent</a>
-          <button id="testDrive" class="btn ghost">Test drive</button>
+          <button id="testDrive" class="btn ghost">Get earnings assessment</button>
         </div>
         <div class="panel" style="margin-top:16px;">
           <div class="badge"><span class="dot"></span> Live from your agent</div>
@@ -131,14 +131,31 @@
     <a class="btn primary" href="onboarding.html">Claim your agent</a>
   </div>
 
-  <!-- Test-drive overlay -->
+  <!-- Earnings assessment overlay -->
   <div class="overlay" id="testOverlay">
     <div class="box">
-      <h3>Test drive your agent</h3>
-      <p class="small">We'll simulate a quick scan and send you to an example fast‑payout offer.</p>
-      <div class="progress"><div class="bar"></div></div>
+      <h3>Get your earnings assessment</h3>
+      <p class="small">A directional estimate of what you could earn by enabling all automations. Inputs are optional and only used locally.</p>
+      <div class="wizard inputs" style="display:block; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:12px; margin-top:8px;">
+        <label class="input"><span>Years of experience</span><input id="assYears" type="number" min="0" max="40" placeholder="6"></label>
+        <label class="input"><span>Location (city, region)</span><input id="assLocation" type="text" placeholder="Austin, TX"></label>
+        <label class="input"><span>Age (optional)</span><input id="assAge" type="number" min="16" max="100" placeholder="32"></label>
+        <label class="input" style="grid-column: 1 / -1;"><span>Skills (comma‑separated)</span><input id="assSkills" type="text" placeholder="e.g., performance marketing, lifecycle, paid social"></label>
+        <label class="input"><span>LinkedIn URL</span><input id="assLinkedIn" type="url" placeholder="https://www.linkedin.com/in/you"></label>
+        <label class="input"><span>Twitter / X URL</span><input id="assTwitter" type="url" placeholder="https://x.com/you"></label>
+        <label class="input"><span>Instagram URL</span><input id="assInstagram" type="url" placeholder="https://instagram.com/you"></label>
+        <label class="input"><span>Hours per week target</span><input id="assHours" type="range" min="0" max="20" value="6"><span id="assHoursVal" class="chip">6 hrs</span></label>
+      </div>
+      <div class="card" style="margin-top:12px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+          <div><div class="small">Estimated monthly (all automations on)</div><div id="assEstimate" style="font-size:22px; font-weight:800;">$0 / mo</div></div>
+          <div style="display:flex; gap:10px;">
+            <button id="assCalc" class="btn">Get estimate</button>
+            <a id="assConfigure" class="btn primary" href="onboarding.html">Configure my agent</a>
+          </div>
+        </div>
+      </div>
       <div style="display:flex; gap:10px; margin-top:12px;">
-        <button id="testDriveGo" class="btn" disabled>See my offer →</button>
         <button id="testDriveClose" class="btn gray">Close</button>
       </div>
     </div>

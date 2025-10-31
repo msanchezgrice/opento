@@ -120,18 +120,42 @@ function spawnPings(){
   setInterval(addPing, 700);
 }
 
-/* ---------- Overlay (Test Drive) ---------- */
+/* ---------- Overlay (Earnings Assessment) ---------- */
 function testDriveInit(){
+  // Reuse id hooks for compatibility, but implement assessment UX
   const openBtn = qs('#testDrive');
   const ov = qs('#testOverlay'); if(!openBtn || !ov) return;
-  const bar = ov.querySelector('.bar');
-  openBtn.addEventListener('click', ()=>{
-    ov.style.display='flex'; bar.style.width='0%'; track('TestDrive Opened');
-    let p=0; const iv=setInterval(()=>{ p+=Math.random()*25; if(p>=100){ p=100; clearInterval(iv); qs('#testDriveGo').disabled=false; } bar.style.width = p+'%'; }, 500);
-  });
-  qs('#testDriveGo')?.addEventListener('click', ()=>{
-    track('TestDrive Proceed'); window.location.href='inbox.html?tab=micro&demo=1';
-  });
+  const hours = qs('#assHours'); const hoursVal = qs('#assHoursVal');
+  function updateHours(){ if(hoursVal && hours){ hoursVal.textContent = `${hours.value} hrs`; } }
+  hours?.addEventListener('input', updateHours); updateHours();
+
+  function calc(){
+    const years = Number(qs('#assYears')?.value || 6);
+    const skillsRaw = (qs('#assSkills')?.value || '').trim();
+    const skills = skillsRaw ? skillsRaw.split(/[.,;\n]+|\s*,\s*/).filter(Boolean) : [];
+    const loc = (qs('#assLocation')?.value || '').toLowerCase();
+    const age = Number(qs('#assAge')?.value || 0); // optional, not weighted directly
+    const hasLinkedIn = !!(qs('#assLinkedIn')?.value || '').trim();
+    const hasTwitter = !!(qs('#assTwitter')?.value || '').trim();
+    const hasInstagram = !!(qs('#assInstagram')?.value || '').trim();
+    const hrs = Number(hours?.value || 6);
+
+    // Base potential hourly from experience (bounded)
+    const baseHr = Math.min(200, Math.max(30, 30 + years*5));
+    const skillsBoost = Math.min(20, skills.length * 2.5); // breadth of skills
+    const socialBoost = (hasLinkedIn?6:0) + (hasTwitter?4:0) + (hasInstagram?3:0);
+    const geoBoost = /(sf|san francisco|new york|nyc|seattle|austin|la|los angeles|london|berlin|toronto)/.test(loc) ? 8 : 0;
+    const trustBoost = 8; // enabling all automations increases throughput
+
+    const hourly = baseHr + skillsBoost + socialBoost + geoBoost + trustBoost;
+    const monthly = Math.round(hourly * Math.max(0, hrs) * 4 * 1.1); // slight upside factor
+
+    const out = qs('#assEstimate'); if(out){ out.textContent = `${formatUsd(monthly)} / mo`; }
+    track('Assessment Calculated', { years, skills: skills.length, hasLinkedIn, hasTwitter, hasInstagram, hrs, loc, ageProvided: !!age });
+  }
+
+  openBtn.addEventListener('click', ()=>{ ov.style.display='flex'; track('Assessment Opened'); });
+  qs('#assCalc')?.addEventListener('click', calc);
   qs('#testDriveClose')?.addEventListener('click', ()=> ov.style.display='none');
 }
 
