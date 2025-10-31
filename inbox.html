@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Opento — Agent Inbox</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-nav">
+    <div class="container">
+      <div class="brand"><img class="brand-logo" src="assets/logo.svg" alt=""><div class="brand-name">Opento</div></div>
+      <div class="chips">
+        <div class="chip">Why matched: performance marketing</div>
+        <div class="chip">Austin (remote)</div>
+        <div class="chip">Managed $3.2M/yr spend</div>
+        <div class="chip">Prefers async brief first</div>
+      </div>
+      <div><a class="btn" href="recipes.html">Recipes</a></div>
+    </div>
+  </div>
+
+  <div class="app-shell">
+    <div class="sidebar">
+      <h4>Inbox</h4>
+      <div class="menu">
+        <a data-tab="all" class="active" href="#">All offers</a>
+        <a data-tab="research" href="#">Consults</a>
+        <a data-tab="micro" href="#">Async sprints</a>
+        <a data-tab="jobs" href="#">Retainers</a>
+        <a data-tab="data" href="#">Labeling</a>
+        <a href="email.html">Weekly digest</a>
+      </div>
+      <h4 style="margin-top:14px;">Balance</h4>
+      <div class="card"><div id="balanceVal" style="font-size:22px;font-weight:800;">$6,480</div><div class="small">Available</div></div>
+    </div>
+
+    <div>
+      <div class="toolbar">
+        <div class="selector"><input id="selAll" type="checkbox"> <span class="small">Select all (<span id="selCount">0</span>)</span></div>
+        <div class="search"><span>🔎</span><input style="border:0; background:transparent; outline:none; width:100%;" placeholder="Filter offers…"></div>
+        <button id="bulkAccept" class="btn gray">Bulk accept</button>
+        <button id="bulkDecline" class="btn gray">Bulk decline</button>
+      </div>
+
+      <div class="activity"></div>
+
+      <div class="results">
+        <!-- Offer 1: Fast payout -->
+        <div class="offer" data-cat="micro" data-fast="1">
+          <div class="sel"><input type="checkbox"></div>
+          <div>
+            <div class="title">Creative QA sprint — 8 hooks scored</div>
+            <div class="meta">Subscription box • Async • <strong>$12/5m</strong> • Deliver tonight</div>
+            <div class="chips" style="margin-top:6px;"><div class="chip">Meets floor</div><div class="chip">Fast payout</div></div>
+          </div>
+          <div class="actions">
+            <div class="state queued">Queued</div>
+            <button class="btn small accept">Accept & reserve</button>
+            <button class="btn small gray decline">Decline</button>
+          </div>
+        </div>
+
+        <!-- Offer 2 -->
+        <div class="offer" data-cat="research">
+          <div class="sel"><input type="checkbox"></div>
+          <div>
+            <div class="title">30-min consult — Ads efficiency reset</div>
+            <div class="meta">Fintech • Remote • <strong>$110/30m</strong> • Wed 1:30 PM CT</div>
+            <div class="chips" style="margin-top:6px;">
+              <div class="chip">Why matched: performance marketing, CAC reset</div><div class="chip">Budget approved</div>
+            </div>
+          </div>
+          <div class="actions">
+            <div class="state queued">Queued</div>
+            <button class="btn small details">Details</button>
+            <button class="btn small accept">Accept</button>
+            <button class="btn small gray decline">Decline</button>
+          </div>
+        </div>
+
+        <!-- Offer 3 -->
+        <div class="offer" data-cat="jobs">
+          <div class="sel"><input type="checkbox"></div>
+          <div>
+            <div class="title">Fractional performance marketer — 3mo retainer</div>
+            <div class="meta">Marketplace • Remote • <strong>$85/hr</strong> • Kickoff call</div>
+            <div class="chips" style="margin-top:6px;"><div class="chip">8–12 hrs/week</div><div class="chip">Async updates first</div></div>
+          </div>
+          <div class="actions">
+            <div class="state queued">Queued</div>
+            <button class="btn small accept">Accept</button>
+            <button class="btn small gray decline">Decline</button>
+          </div>
+        </div>
+
+        <!-- Offer 4 -->
+        <div class="offer" data-cat="data">
+          <div class="sel"><input type="checkbox"></div>
+          <div>
+            <div class="title">Label UGC hooks — Performance dataset</div>
+            <div class="meta">Creator analytics • Async • <strong>$18/15m</strong> • Files ready</div>
+            <div class="reveal">Scope: tag winning hooks, flag compliance issues • Payment releases within 24h</div>
+          </div>
+          <div class="actions">
+            <div class="state queued">Queued</div>
+            <button class="btn small accept">Accept</button>
+            <button class="btn small gray decline">Decline</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Offer modal -->
+  <div class="modal" id="offerModal">
+    <div class="dialog">
+      <header><div><strong>30-min consult — Ads efficiency reset</strong></div><button class="btn small gray close">Close</button></header>
+      <main>
+        <div>
+          <p><strong>Brief</strong></p>
+          <p class="small">Series A fintech is recalibrating Meta + Google spend ahead of Q2 launch. Needs a CAC playbook, creative themes, and a fresher retargeting mix.</p>
+          <div class="chips" style="margin:8px 0;">
+            <div class="chip">Why matched: performance marketing</div><div class="chip">Austin (remote)</div><div class="chip">Budget approved</div>
+          </div>
+          <p><strong>Offer</strong>: <span class="chip">$110 / 30 min</span> • <span class="chip">Wed 1:30 PM CT</span></p>
+          <p class="small">Escrowed. Instant payout on completion.</p>
+          <div style="margin-top:12px;"><button class="btn accept">Accept & reveal</button> <button class="btn gray decline">Decline</button></div>
+        </div>
+        <div>
+          <p><strong>Consent scope</strong></p>
+          <div class="scope">
+            <div class="item allow">✔ Share: role, anonymized KPIs, case studies</div>
+            <div class="item deny">✖ Hide: employer names, exact spend history</div>
+          </div>
+          <p style="margin-top:10px;"><strong>Reveal (on accept)</strong></p>
+          <div class="reveal">Founder email • budget doc • notion workspace invite</div>
+          <p class="small" style="margin-top:8px;">Anonymous first. Identity reveals only on accept + escrow.</p>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Share / Referral modal -->
+  <div class="modal" id="shareModal">
+    <div class="dialog">
+      <header><div><strong>Nice—your agent locked in new work overnight.</strong></div><button class="btn small gray" data-close="intro" onclick="closeShareModal()">Close</button></header>
+      <main>
+        <div>
+          <h3 style="margin-top:0;">You earned <span id="shareVal" style="color:#065f46;">$284</span></h3>
+          <p class="small">Examples only; results vary. No personal details shared.</p>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button class="btn" onclick="dlShareCard()">Share / Download receipt</button>
+            <a class="btn gray" href="handle.html?u=growthmaya" target="_blank">View your agent page</a>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <strong>Give $25 · Get $25</strong>
+            <p class="small">Invite a teammate to a fast CAC cleanup. You both receive $25 once they clear their first payout.</p>
+            <button class="btn small" onclick="navigator.clipboard.writeText('https://opento.me/invite/GROWTH25').then(()=>toast('Referral link copied'))">Copy referral link</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

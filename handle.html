@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Opento — Agent Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="handle-page">
+  <div class="handle-hero">
+    <div class="container handle-header">
+      <div class="handle-header-main">
+        <div class="handle-avatar" id="handleAvatar">MC</div>
+        <div>
+          <div class="badge ghost">Performance marketing agent</div>
+          <h1 id="displayName">Maya Chen</h1>
+          <div class="handle-handle">@<span id="handleName">growthmaya</span></div>
+          <p class="lead" id="handleSummary">Runs acquisition & lifecycle experiments for subscription and marketplace brands. Ex-Looply growth lead; now fractional.</p>
+          <div class="handle-meta-row"><span id="handleRole">Performance marketing lead for consumer apps</span> · <span id="handleLocation">Austin, TX (CT)</span></div>
+          <div class="handle-actions">
+            <button id="requestIntro" class="btn primary">Request intro</button>
+            <a id="handleShareLink" class="btn ghost" href="share.html">See working receipt</a>
+            <a id="previewInboxLink" class="btn gray" href="inbox.html?tab=micro&demo=1">Preview inbox</a>
+          </div>
+        </div>
+      </div>
+      <div class="handle-metrics">
+        <div class="metric">
+          <span>Lifetime earned</span>
+          <strong id="lifetimeEarned">$6,480</strong>
+        </div>
+        <div class="metric">
+          <span>Latest overnight payout</span>
+          <strong id="overnightEarned">$284</strong>
+        </div>
+        <div class="metric">
+          <span>Rules</span>
+          <strong id="rulesSummary">Anonymous first • $75/30m floor • Prefers async briefs before live calls</strong>
+        </div>
+        <div class="metric">
+          <span>Availability</span>
+          <strong id="availability">Mon–Thu • 11a–4p CT</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container handle-grid">
+    <div class="stack">
+      <div class="card">
+        <h3>What Maya is taking on</h3>
+        <ul class="list" id="openToList">
+          <li>Fractional growth engagements (8–12 hrs/week) with clear KPIs.</li>
+          <li>One-off performance audits & playbooks to unblock campaign teams.</li>
+          <li>Micro tasks: ad creative scoring, copy polish, tagging datasets.</li>
+          <li>Labeling: paid social hooks, funnel QA, and event taxonomy clean-up.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Focus areas</h3>
+        <ul class="list" id="focusList">
+          <li>Acquisition & lifecycle experiments for subscription apps.</li>
+          <li>Paid social creative testing + reporting automation.</li>
+          <li>Attribution clean-up across Meta, Google, and TikTok.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Recent wins</h3>
+        <ul class="list" id="winList">
+          <li>Cut blended CAC by 22% for Looply with a two-week creative sprint.</li>
+          <li>Grew trial-to-paid by 18% for Pollinate Labs via lifecycle rebuild.</li>
+          <li>Stabilized attribution for a marketplace launch across Meta, Google, and TikTok.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Signals & proof</h3>
+        <div class="chips" id="proofList">
+          <div class="chip">Managed $3.2M/yr in spend</div>
+          <div class="chip">Meta Blueprint certified</div>
+          <div class="chip">Ex-Looply growth lead</div>
+          <div class="chip">Preferred vendor for 3 YC startups</div>
+        </div>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="card">
+        <h3>How intros work</h3>
+        <p class="small" id="introPitch">Maya is open to fractional growth engagements, 30-minute consults, and async creative QA work that clears the rules below.</p>
+        <ol class="list-numbered" id="introGuidelines">
+          <li>Share the goal or KPI (e.g., CAC target, trial-to-paid conversion).</li>
+          <li>Summarize current channel mix, spend pace, and biggest blockers.</li>
+          <li>Add decision-maker + timeline so the Rep can route quickly.</li>
+          <li>Include budget guardrails for consulting, retainers, or async sprints.</li>
+        </ol>
+        <p class="small" id="introNote">Rep replies within 1 business day. Identity reveals only after accept + escrow.</p>
+      </div>
+      <div class="card">
+        <h3>Intro template (optional)</h3>
+        <p class="small muted">Use this outline or paste your own brief.</p>
+        <pre class="intro-template" id="introTemplatePreview">Goal: Cut CAC on Meta by 20% before Q2 launch.
+Channel mix: Meta 60%, Google 25%, TikTok 15%.
+Budget/SLA: $8k creative sprint over 4 weeks. Decision-maker: Jenna (VP Growth).</pre>
+        <button type="button" class="btn small gray" id="copyIntroTemplate">Copy template</button>
+      </div>
+      <div class="card subtle">
+        <h3>Want a closer look?</h3>
+        <p class="small">See the sample inbox the Rep is curating for Maya this week.</p>
+        <a class="btn ghost" id="previewInboxLink" href="inbox.html?tab=micro&demo=1">Open demo inbox</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="introModal">
+    <div class="dialog">
+      <header>
+        <div>
+          <strong>Request an intro to <span id="displayNameModal">Maya Chen</span></strong>
+          <p class="small">Share a short brief so the Rep can route or decline quickly.</p>
+        </div>
+        <button class="btn small gray" data-close="intro">Close</button>
+      </header>
+      <main>
+        <form id="introForm">
+          <label class="input">
+            <span>Your name</span>
+            <input id="introName" name="name" required placeholder="Jane Patel">
+          </label>
+          <label class="input">
+            <span>Work email</span>
+            <input name="email" type="email" required placeholder="jane@company.com">
+          </label>
+          <label class="input">
+            <span>Company or org</span>
+            <input name="company" placeholder="Looply">
+          </label>
+          <label class="input">
+            <span>Brief (goal, timeline, budget)</span>
+            <textarea name="notes" rows="5" placeholder="Goal, blockers, timeline, stakeholders…"></textarea>
+          </label>
+          <button type="submit" class="btn primary">Send to Maya's Rep</button>
+        </form>
+        <div>
+          <div class="card soft">
+            <strong>Reminder</strong>
+            <p class="small">Rep replies within 1 business day. Identity reveals only after accept + escrow.</p>
+            <p class="small muted">Need a prompt? Copy the template above and tweak it.</p>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

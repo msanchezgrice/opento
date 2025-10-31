@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Opento — Shareable Receipt</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="share-page">
+  <div class="container share-wrap">
+    <h2 data-share-headline>My agent kept campaigns warm overnight.</h2>
+    <p class="lead" data-share-subheadline>3 automation sprints closed while I slept.</p>
+    <div class="share-card">
+      <canvas id="shareCanvas" style="border-radius:12px; box-shadow: 0 10px 30px rgba(11,19,42,.25);"></canvas>
+    </div>
+    <div class="share-actions">
+      <button id="dlPng" class="btn">Download PNG</button>
+      <button id="copyLink" class="btn gray">Copy link</button>
+      <button id="copyCaption" class="btn ghost">Copy caption</button>
+      <a id="shareViewAgent" class="btn gray" href="handle.html?u=growthmaya">View agent page</a>
+    </div>
+    <div class="share-stat" data-share-value="+$284">+$284</div>
+    <label class="small muted" for="shareCaption">Suggested caption</label>
+    <textarea id="shareCaption" class="share-caption" rows="3" readonly>Maya Chen's agent shipped 3 growth cleanups overnight: +$284 while she slept. Powered by Opento.</textarea>
+    <p class="small" data-share-footer>Opento — Anonymous first • Instant payouts</p>
+    <div class="card share-tips">
+      <h3>How to use this receipt</h3>
+      <ul class="list">
+        <li>Post the PNG on LinkedIn or X to show progress without revealing client names.</li>
+        <li>Add the caption or tweak it to fit your tone—no sensitive info included.</li>
+        <li>Link to your agent page so people can request intros under your rules.</li>
+      </ul>
+      <p class="small muted">Examples only; results vary. Your Rep only shares what you approve.</p>
+      <div class="share-link" id="shareLinkFriendly">opento.me/growthmaya</div>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Opento — Onboarding</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="onboarding-page">
+  <div class="app-nav">
+    <div class="container" style="gap:12px;">
+      <div class="brand"><img class="brand-logo" src="assets/logo.svg" alt=""><div class="brand-name">Opento</div></div>
+      <div class="goal"><span class="small">You're</span> <div class="meter"><div class="fill" style="width:0;"></div></div> <span class="small">to earning</span></div>
+      <div class="progress" style="flex:1; height:8px; background:#eef2ff; border-radius:999px; overflow:hidden;"><div class="bar" style="height:100%; width:0; background:linear-gradient(90deg, #2D6FFF, #2EE6A6);"></div></div>
+      <div class="step-indicator small">Step 1 of 3</div>
+    </div>
+  </div>
+
+  <div class="container section">
+    <h2>How do you want to set up your agent?</h2>
+    <div class="card quickstart-card">
+      <div>
+        <h3>QuickStart (recommended)</h3>
+        <p class="small" id="quickStartDesc">Default rules tuned for performance marketers: Growth audits + creative QA ON, $75/30m consult floor, $12/5m async sprints, Mon–Thu 11a–4p CT, Anonymous first, Auto-accept fast async tasks.</p>
+      </div>
+      <button id="quickStart" class="btn">Start QuickStart</button>
+    </div>
+
+    <div class="wizard">
+      <div>
+        <div class="step">
+          <h3>Custom — What are you open to?</h3>
+          <div class="option"><div><strong>Growth audits & consults</strong><div class="small">Deep dives on CAC, retention, and channel mix.</div></div><div class="switch on" data-label="Growth audits"></div></div>
+          <div class="option"><div><strong>Campaign setup & optimization</strong><div class="small">Hands-on experiment sprints + reporting clean-up.</div></div><div class="switch on" data-label="Campaign optimization"></div></div>
+          <div class="option"><div><strong>Fractional retainers</strong><div class="small">Week-over-week performance support.</div></div><div class="switch on" data-label="Fractional retainers"></div></div>
+          <div class="option"><div><strong>Data labeling & QA</strong><div class="small">Tagging hooks, funnel QA, event taxonomy clean-up.</div></div><div class="switch on" data-label="Data labeling"></div></div>
+          <div style="display:flex; gap:10px; margin-top:12px;"><button class="btn gray" data-back>Back</button><button class="btn" data-next>Continue</button></div>
+        </div>
+
+        <div class="step">
+          <h3>Set floors & availability</h3>
+          <div class="inputs">
+            <label class="input"><span>Consult minimum ($ per 30 minutes)</span><input id="floor" type="range" min="30" max="200" step="5" value="75"><span id="floorVal" class="chip">$75</span><div class="small">Auto-declines briefs below this.</div></label>
+            <label class="input"><span>Async sprint minimum ($ per 5 minutes)</span><input id="microfloor" type="range" min="5" max="40" step="1" value="12"><span id="microVal" class="chip">$12</span></label>
+            <label class="input"><span>Weekly hours target</span><input id="hours" type="range" min="0" max="20" value="6"><span id="hoursVal" class="chip">6 hrs</span></label>
+            <label class="input"><span>Auto-book windows</span><select id="autoWindow"><option>Mon–Thu 11a–4p CT</option><option>Mon–Fri Lunch hours</option><option>Tue & Thu Evenings</option></select><div class="small">Your Rep only books in these windows.</div></label>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:12px;"><button class="btn gray" data-back>Back</button><button class="btn" data-next>Continue</button></div>
+        </div>
+
+        <div class="step">
+          <h3>Consent & reveal rules</h3>
+          <div class="scope">
+            <div class="item allow">✔ Share: role, anonymized KPIs, case studies</div>
+            <div class="item deny">✖ Hide: employer names, exact spend history</div>
+          </div>
+          <div class="option" style="margin-top:12px;"><div><strong>Anonymous first</strong><div class="small">Identity reveals on accept + escrow.</div></div><div class="switch on" data-label="Anonymous first"></div></div>
+          <div class="option"><div><strong>Consent reminders</strong><div class="small">Show what's shared before each accept.</div></div><div class="switch on" data-label="Consent reminders"></div></div>
+          <div style="display:flex; gap:10px; margin-top:12px;"><button class="btn gray" data-back>Back</button><button class="btn" data-finish>Finish & start agent</button></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="badge"><span class="dot"></span> Preview</div>
+        <div class="cards preview-cards">
+          <div class="card preview-card"><div class="metric" data-preview="floor">$75</div><div class="small">30-min consult floor</div></div>
+          <div class="card preview-card"><div class="metric" data-preview="micro">$12 / 5m</div><div class="small">Async sprint floor</div></div>
+          <div class="card preview-card"><div class="metric" data-preview="window">Mon–Thu 11a–4p CT</div><div class="small">Auto-book window</div></div>
+          <div class="card preview-card"><div class="metric" data-preview="hours">6 hrs / wk</div><div class="small">Weekly hours target</div></div>
+        </div>
+        <div class="chips" id="previewFocus"></div>
+        <p class="small" id="previewSummary">Your Scout will watch for growth audits, campaign cleanups, and async creative QA within these rules.</p>
+      </div>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

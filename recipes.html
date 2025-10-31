@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Opento — Recipes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-nav">
+    <div class="container">
+      <div class="brand"><img class="brand-logo" src="assets/logo.svg" alt=""><div class="brand-name">Opento</div></div>
+      <div class="small">Define how your agent shares growth data and when it auto-accepts work.</div>
+      <div><a class="btn gray" href="inbox.html">Back to Inbox</a></div>
+    </div>
+  </div>
+
+  <div class="container section" style="display:grid; grid-template-columns: 1.1fr 0.9fr; gap:16px;">
+    <div>
+      <h2>Maya's recipes</h2>
+      <div class="card" style="margin-bottom:10px;">
+        <strong>Recommended</strong>
+        <p class="small">We pinned a few combinations that work well for performance marketers. Tweak or disable them anytime.</p>
+      </div>
+      <div id="recipesHolder"></div>
+      <div style="margin-top:12px;">
+        <details>
+          <summary><strong>Advanced builder</strong></summary>
+          <div style="margin-top:10px;"><button id="rNew" class="btn">+ New recipe</button></div>
+        </details>
+      </div>
+
+      <h3 style="margin-top:20px;">Suggestions</h3>
+      <div id="suggestions"></div>
+    </div>
+
+    <div>
+      <h2>Consent preview</h2>
+      <div class="card">
+        <p class="small">This is what Maya's Rep enforces before identity is revealed.</p>
+        <div class="scope">
+          <div class="item allow">✔ Share: role, anonymized KPIs, case studies</div>
+          <div class="item deny">✖ Hide: employer names, exact spend history</div>
+        </div>
+        <p style="margin-top:8px;" class="small">Revoke access anytime. Every change is logged in the consent ledger.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recipe modal -->
+  <div class="modal" id="recipeModal">
+    <div class="dialog">
+      <header><div><strong>Recipe</strong></div><button id="rCancel" class="btn small gray">Close</button></header>
+      <main>
+        <div>
+          <label class="small">Title</label>
+          <input id="rTitle" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:10px;" placeholder="e.g., Acquisition sprints — auto-accept under $120/30m">
+          <label class="small" style="display:block; margin-top:10px;">Chips (comma-separated)</label>
+          <input id="rChips" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:10px;" placeholder="Share: goal, channel mix, Hide: employer name, Window: Mon–Thu 11a–4p CT">
+          <div style="margin-top:10px;"><label><input id="rAuto" type="checkbox"> Auto-accept</label></div>
+        </div>
+        <div>
+          <div class="card">
+            <p class="small">Preview</p>
+            <div class="chips" id="rPreviewChips"></div>
+            <p class="small" id="rPreviewAuto"></p>
+          </div>
+          <div style="margin-top:10px;"><button id="rSave" class="btn">Save recipe</button></div>
+          <input id="rIdx" type="hidden" value="">
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
