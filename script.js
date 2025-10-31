@@ -170,6 +170,31 @@ function updateOnboardingPreview(){
       ? `Your Scout will watch for ${enabled.join(', ')} within these rules.`
       : 'Choose at least one category so your Scout knows what to surface.';
   }
+
+  // Estimate potential (aspirational) — shows impact of more categories & hours
+  const estNode = qs('#estMonthly');
+  if(estNode){
+    const consultEnabled = ['Growth audits','Campaign optimization','Fractional retainers'].some(lbl=> enabled.includes(lbl));
+    const microEnabled = enabled.includes('Data labeling');
+    const consultRateHr = floorVal * 2; // $/hr from $/30m
+    const microRateHr = microVal * 12;  // $/hr from $/5m
+    let blendedRate = 0;
+    if(consultEnabled && microEnabled){ blendedRate = consultRateHr*0.6 + microRateHr*0.4; }
+    else if(consultEnabled){ blendedRate = consultRateHr; }
+    else if(microEnabled){ blendedRate = microRateHr; }
+    else { blendedRate = Math.max(consultRateHr, microRateHr) * 0.6; }
+
+    const categorySet = ['Growth audits','Campaign optimization','Fractional retainers','Data labeling'];
+    const categoriesCount = categorySet.filter(lbl=> enabled.includes(lbl)).length;
+    let matchMultiplier = 0.6 + 0.1 * categoriesCount; // 0.6–1.0 based on enabled breadth
+    if(enabled.includes('Anonymous first')) matchMultiplier += 0.05; // trust signal bump
+    if(enabled.includes('Consent reminders')) matchMultiplier += 0.05;
+    matchMultiplier = Math.min(1.1, matchMultiplier); // soft cap
+
+    const estWeekly = Math.round(hoursVal * blendedRate * matchMultiplier);
+    const estMonthly = estWeekly * 4;
+    estNode.textContent = formatUsd(estMonthly) + ' / mo';
+  }
 }
 
 function bindSwitches(){
