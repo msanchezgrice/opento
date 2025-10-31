@@ -50,6 +50,9 @@ small, .small { color: var(--muted); }
 .brand-name { font-weight:800; letter-spacing:0.2px; }
 .nav .btn { background:#ffffff12; border:1px solid #ffffff35; }
 .nav .btn.primary { background: var(--primary); border-color: transparent; }
+/* Mobile nav */
+.menu-toggle { display:none; background:transparent; border:1px solid #ffffff35; color:#fff; padding:8px 10px; border-radius:8px; font-weight:700; }
+.actions { display:flex; align-items:center; gap:8px; }
 
 .hero { display:grid; grid-template-columns: 1.2fr 0.8fr; gap: 28px; padding: 40px 24px 22px; }
 .hero h1 { font-size: 48px; line-height: 1.06; margin:0 0 12px; }
@@ -94,6 +97,10 @@ small, .small { color: var(--muted); }
 .btn.small { padding: 8px 10px; border-radius: 8px; font-weight: 600; font-size: 13px; box-shadow:none; }
 
 .footer { padding: 26px; color: #7b8499; text-align:center; }
+
+/* Assessment overlay */
+.ass-footer { position: sticky; bottom: 0; background: var(--card); border-top:1px solid var(--border); }
+.avatar.sm { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:12px; box-shadow: var(--shadow-1); }
 
 /* App chrome */
 .app-nav { background: var(--card); border-bottom:1px solid var(--border); position: sticky; top:0; z-index: 10; }
@@ -244,9 +251,14 @@ small, .small { color: var(--muted); }
   .handle-grid { grid-template-columns: 1fr; }
   .handle-header-main { flex-direction:column; }
   .handle-actions { justify-content:flex-start; }
+  .hero { grid-template-columns: 1fr; }
+  .menu-toggle { display:inline-flex; }
+  .nav .actions { display:none; }
+  .nav.open .actions { display:flex; flex-direction:column; gap:8px; position:absolute; right:18px; top:58px; background: var(--card); padding:10px; border:1px solid var(--border); border-radius:10px; box-shadow: var(--shadow-2); }
 }
 
 @media (max-width: 640px){
   .handle-metrics { grid-template-columns: 1fr; }
   .share-wrap { padding:36px 18px; }
+  .overlay .wizard.inputs { display:block; }
 }

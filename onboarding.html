@@ -18,6 +18,10 @@
 
   <div class="container section">
     <h2>How do you want to set up your agent?</h2>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+      <button id="useAssessment" class="btn small">Use assessment inputs</button>
+      <button id="resetDefaults" class="btn small gray">Reset to defaults</button>
+    </div>
     <div class="card quickstart-card">
       <div>
         <h3>QuickStart (recommended)</h3>
@@ -40,9 +44,9 @@
         <div class="step">
           <h3>Set floors & availability</h3>
           <div class="inputs">
-            <label class="input"><span>Consult minimum ($ per 30 minutes)</span><input id="floor" type="range" min="30" max="200" step="5" value="75"><span id="floorVal" class="chip">$75</span><div class="small">Auto-declines briefs below this.</div></label>
-            <label class="input"><span>Async sprint minimum ($ per 5 minutes)</span><input id="microfloor" type="range" min="5" max="40" step="1" value="12"><span id="microVal" class="chip">$12</span></label>
-            <label class="input"><span>Weekly hours target</span><input id="hours" type="range" min="0" max="20" value="6"><span id="hoursVal" class="chip">6 hrs</span></label>
+            <label class="input"><span>Consult minimum ($ per 30 minutes)</span><input id="floor" type="range" min="30" max="200" step="5" value="75" aria-label="Consult minimum per 30 minutes"><span id="floorVal" class="chip" aria-live="polite">$75</span><div class="small">Auto-declines briefs below this.</div></label>
+            <label class="input"><span>Async sprint minimum ($ per 5 minutes)</span><input id="microfloor" type="range" min="5" max="40" step="1" value="12" aria-label="Async sprint minimum per 5 minutes"><span id="microVal" class="chip" aria-live="polite">$12</span></label>
+            <label class="input"><span>Weekly hours target</span><input id="hours" type="range" min="0" max="20" value="6" aria-label="Weekly hours target"><span id="hoursVal" class="chip" aria-live="polite">6 hrs</span></label>
             <label class="input"><span>Auto-book windows</span><select id="autoWindow"><option>Mon–Thu 11a–4p CT</option><option>Mon–Fri Lunch hours</option><option>Tue & Thu Evenings</option></select><div class="small">Your Rep only books in these windows.</div></label>
           </div>
           <div style="display:flex; gap:10px; margin-top:12px;"><button class="btn gray" data-back>Back</button><button class="btn" data-next>Continue</button></div>
@@ -63,11 +67,11 @@
       <div class="panel">
         <div class="badge"><span class="dot"></span> Preview</div>
         <div class="cards preview-cards">
-          <div class="card preview-card"><div class="metric" data-preview="floor">$75</div><div class="small">30-min consult floor</div></div>
-          <div class="card preview-card"><div class="metric" data-preview="micro">$12 / 5m</div><div class="small">Async sprint floor</div></div>
-          <div class="card preview-card"><div class="metric" data-preview="window">Mon–Thu 11a–4p CT</div><div class="small">Auto-book window</div></div>
-          <div class="card preview-card"><div class="metric" data-preview="hours">6 hrs / wk</div><div class="small">Weekly hours target</div></div>
-          <div class="card preview-card"><div class="metric" id="estMonthly">$0 / mo</div><div class="small">Total estimated (aspirational)</div></div>
+          <div class="card preview-card"><div class="metric" data-preview="floor">$75</div><div class="small"><span title="Minimum price for 30‑minute live consults.">i</span> 30-min consult floor</div></div>
+          <div class="card preview-card"><div class="metric" data-preview="micro">$12 / 5m</div><div class="small"><span title="Minimum price for 5‑minute async sprints.">i</span> Async sprint floor</div></div>
+          <div class="card preview-card"><div class="metric" data-preview="window">Mon–Thu 11a–4p CT</div><div class="small"><span title="Times your Rep may auto‑book.">i</span> Auto-book window</div></div>
+          <div class="card preview-card"><div class="metric" data-preview="hours">6 hrs / wk</div><div class="small"><span title="Weekly hours target used for projections.">i</span> Weekly hours target</div></div>
+          <div class="card preview-card"><div class="metric" id="estMonthly" aria-live="polite">$0 / mo</div><div class="small"><span title="Directional projection; assumes all automations on.">i</span> Total estimated (aspirational)</div></div>
         </div>
         <div class="chips" id="previewFocus"></div>
         <p class="small" id="previewSummary">Your Scout will watch for growth audits, campaign cleanups, and async creative QA within these rules.</p>

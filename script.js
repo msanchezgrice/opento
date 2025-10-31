@@ -126,37 +126,119 @@ function testDriveInit(){
   const openBtn = qs('#testDrive');
   const ov = qs('#testOverlay'); if(!openBtn || !ov) return;
   const hours = qs('#assHours'); const hoursVal = qs('#assHoursVal');
+  const yearsSel = qs('#assYears');
+  const skillsInput = qs('#assSkills');
+  const locInput = qs('#assLocation');
+  const ln = qs('#assLinkedIn'); const tw = qs('#assTwitter'); const ig = qs('#assInstagram');
+  const calcBtn = qs('#assCalc');
+  const estOut = qs('#assEstimate'); const rangeOut = qs('#assRange');
+  let lastFocused=null;
   function updateHours(){ if(hoursVal && hours){ hoursVal.textContent = `${hours.value} hrs`; } }
   hours?.addEventListener('input', updateHours); updateHours();
 
+  function isValidUrl(u){ if(!u) return true; try{ const x=new URL(u); return /^https?:$/.test(x.protocol); }catch(e){ return false; } }
+  function normalizeSkills(raw){
+    return raw.split(/[.,;\n]+|\s*,\s*/).map(s=>s.trim().toLowerCase()).filter(Boolean);
+  }
+  function validate(){
+    const skillsRaw = (skillsInput?.value || '').trim();
+    const hasSkills = normalizeSkills(skillsRaw).length > 0;
+    const urlsOk = [ln?.value, tw?.value, ig?.value].every(isValidUrl);
+    const ok = hasSkills && urlsOk;
+    if(calcBtn){ calcBtn.disabled = !ok; calcBtn.classList.toggle('gray', !ok); }
+    return ok;
+  }
+  [skillsInput, ln, tw, ig].forEach(el=> el?.addEventListener('input', validate));
+  validate();
+
   function calc(){
-    const years = Number(qs('#assYears')?.value || 6);
-    const skillsRaw = (qs('#assSkills')?.value || '').trim();
+    if(!validate()){ toast('Add at least one skill and fix URL format'); return; }
+    const years = Number(yearsSel?.value || 6);
+    const skillsRaw = (skillsInput?.value || '').trim();
     const skills = skillsRaw ? skillsRaw.split(/[.,;\n]+|\s*,\s*/).filter(Boolean) : [];
-    const loc = (qs('#assLocation')?.value || '').toLowerCase();
+    const loc = (locInput?.value || '').toLowerCase();
     const age = Number(qs('#assAge')?.value || 0); // optional, not weighted directly
-    const hasLinkedIn = !!(qs('#assLinkedIn')?.value || '').trim();
-    const hasTwitter = !!(qs('#assTwitter')?.value || '').trim();
-    const hasInstagram = !!(qs('#assInstagram')?.value || '').trim();
+    const hasLinkedIn = !!(ln?.value || '').trim();
+    const hasTwitter = !!(tw?.value || '').trim();
+    const hasInstagram = !!(ig?.value || '').trim();
     const hrs = Number(hours?.value || 6);
 
-    // Base potential hourly from experience (bounded)
-    const baseHr = Math.min(200, Math.max(30, 30 + years*5));
-    const skillsBoost = Math.min(20, skills.length * 2.5); // breadth of skills
-    const socialBoost = (hasLinkedIn?6:0) + (hasTwitter?4:0) + (hasInstagram?3:0);
-    const geoBoost = /(sf|san francisco|new york|nyc|seattle|austin|la|los angeles|london|berlin|toronto)/.test(loc) ? 8 : 0;
-    const trustBoost = 8; // enabling all automations increases throughput
+    // ---------- Realistic rubric ----------
+    // Experience baseline
+    let baseHr = 25 + years * 3; // grows slower
+    baseHr = Math.max(30, Math.min(baseHr, 140));
 
-    const hourly = baseHr + skillsBoost + socialBoost + geoBoost + trustBoost;
-    const monthly = Math.round(hourly * Math.max(0, hrs) * 4 * 1.1); // slight upside factor
+    // Recognized skills tiers
+    const text = skills.join(' ').toLowerCase();
+    const highTier = ['engineering','ai','ml','data science','strategy'];
+    const coreTier = ['performance marketing','paid social','growth','product management','ux','design','seo','sem','email','lifecycle','content','analytics','copywriting','sales'];
+    let skillScore = 0;
+    coreTier.forEach(k=>{ if(text.includes(k)) skillScore += 4; });
+    highTier.forEach(k=>{ if(text.includes(k)) skillScore += 6; });
+    skillScore = Math.min(skillScore, 30);
 
-    const out = qs('#assEstimate'); if(out){ out.textContent = `${formatUsd(monthly)} / mo`; }
+    // Social presence (trust)
+    const socialBoost = Math.min(10, (hasLinkedIn?6:0) + (hasTwitter?2:0) + (hasInstagram?2:0));
+
+    // Geo coefficient
+    const tier1 = /(san francisco|sf|new york|nyc|seattle|london)/;
+    const tier2 = /(austin|los angeles|la|boston|denver|berlin|toronto|chicago)/;
+    const geoCoef = tier1.test(loc) ? 1.15 : tier2.test(loc) ? 1.07 : 1.0;
+
+    // Utilization factor from hours (fewer hours → less compounding)
+    const util = hrs >= 12 ? 1.0 : hrs >= 8 ? 0.9 : hrs >= 4 ? 0.8 : 0.7;
+
+    const hourly = (baseHr + skillScore + socialBoost) * geoCoef;
+    const monthly = Math.round(hourly * Math.max(0, hrs) * 4 * util * 1.05);
+
+    if(estOut){ estOut.textContent = `${formatUsd(monthly)} / mo`; }
+    if(rangeOut){ const lo=Math.round(monthly*0.8), hi=Math.round(monthly*1.2); rangeOut.textContent = `Typical range ${formatUsd(lo)}–${formatUsd(hi)}`; rangeOut.title = 'Assumes all automations on, steady weekly hours, and healthy match rates.'; }
+    const payload = { years, skills: skills.map(s=>s.toLowerCase()), loc, hrs, hasLinkedIn, hasTwitter, hasInstagram, estMonthly: monthly };
+    localStorage.setItem('opento_assessment', JSON.stringify(payload));
     track('Assessment Calculated', { years, skills: skills.length, hasLinkedIn, hasTwitter, hasInstagram, hrs, loc, ageProvided: !!age });
   }
 
-  openBtn.addEventListener('click', ()=>{ ov.style.display='flex'; track('Assessment Opened'); });
+  function prefill(){
+    try{
+      const saved = JSON.parse(localStorage.getItem('opento_assessment')||'{}');
+      if(saved.years && yearsSel) yearsSel.value = String(saved.years);
+      if(saved.loc && locInput) locInput.value = saved.loc;
+      if(saved.hrs && hours){ hours.value = String(saved.hrs); updateHours(); }
+      if(saved.skills && skillsInput) skillsInput.value = Array.isArray(saved.skills) ? saved.skills.join(', ') : saved.skills;
+    }catch(e){ /* ignore */ }
+  }
+
+  function trapFocus(elems){
+    function onKeydown(e){
+      if(e.key==='Escape'){ e.preventDefault(); close(); }
+      if(e.key!=='Tab') return;
+      const first = elems[0], last = elems[elems.length-1];
+      if(e.shiftKey){ if(document.activeElement===first){ e.preventDefault(); last.focus(); } }
+      else { if(document.activeElement===last){ e.preventDefault(); first.focus(); } }
+    }
+    ov.addEventListener('keydown', onKeydown);
+    return ()=> ov.removeEventListener('keydown', onKeydown);
+  }
+  let untrap = null;
+  function open(){
+    prefill(); ov.style.display='flex'; validate(); track('Assessment Opened'); lastFocused=document.activeElement; setTimeout(()=>{
+      const focusables = qsa('a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])', ov).filter(el=> !el.disabled && el.offsetParent!==null);
+      focusables[0]?.focus(); untrap = trapFocus(focusables);
+    },0);
+  }
+  function close(){ ov.style.display='none'; if(untrap) untrap(); if(lastFocused && lastFocused.focus) lastFocused.focus(); }
+
+  openBtn.addEventListener('click', open);
   qs('#assCalc')?.addEventListener('click', calc);
-  qs('#testDriveClose')?.addEventListener('click', ()=> ov.style.display='none');
+  qs('#testDriveClose')?.addEventListener('click', close);
+  // Prefill onboarding when CTA clicked
+  qs('#assConfigure')?.addEventListener('click', ()=>{
+    if(!localStorage.getItem('opento_assessment')){ calc(); }
+    track('Assessment Configure Clicked');
+  });
+
+  // Auto-recalculate when valid inputs change
+  [yearsSel, skillsInput, locInput, hours].forEach(el=> el?.addEventListener('input', ()=>{ if(validate()) calc(); }));
 }
 
 /* ---------- Onboarding ---------- */
@@ -217,7 +299,17 @@ function updateOnboardingPreview(){
 
     const estWeekly = Math.round(hoursVal * blendedRate * matchMultiplier);
     const estMonthly = estWeekly * 4;
-    estNode.textContent = formatUsd(estMonthly) + ' / mo';
+    // animate number change
+    const prev = Number(estNode.dataset.val || 0);
+    const dur = 500; const t0 = performance.now();
+    function tick(t){
+      const p = Math.min(1, (t - t0) / dur);
+      const cur = Math.round(prev + (estMonthly - prev) * p);
+      estNode.textContent = formatUsd(cur) + ' / mo';
+      if(p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+    estNode.dataset.val = String(estMonthly);
   }
 }
 
@@ -271,6 +363,42 @@ function wizardInit(){
 
   bindSwitches();
   show(0);
+
+  // Apply assessment defaults
+  function applyAssessment(){
+    try{
+      const saved = JSON.parse(localStorage.getItem('opento_assessment')||'{}');
+      if(!saved) return;
+      // Suggest floors from experience tiers
+      const years = Number(saved.years||6);
+      const floor = Math.min(200, Math.max(50, 60 + years*2));
+      const micro = Math.min(40, Math.max(8, 10 + Math.round(years/2)));
+      const hours = Number(saved.hrs||6);
+      const floorInput = qs('#floor'); const microInput = qs('#microfloor'); const hoursInput = qs('#hours');
+      if(floorInput){ floorInput.value = String(floor); }
+      if(microInput){ microInput.value = String(micro); }
+      if(hoursInput){ hoursInput.value = String(hours); }
+
+      const skills = Array.isArray(saved.skills)? saved.skills : [];
+      // map skills to categories
+      const map = {
+        'Growth audits': ['performance marketing','growth','seo','sem','analytics','consulting','strategy'],
+        'Campaign optimization': ['paid social','email','lifecycle','content','copywriting'],
+        'Fractional retainers': ['product management','engineering','design','ux','sales'],
+        'Data labeling': ['qa','label','data','ai','ml']
+      };
+      qsa('.wizard .switch').forEach(sw=>{
+        const label = sw.dataset.label;
+        const keywords = map[label]||[];
+        const hit = skills.some(s=> keywords.some(k=> s.includes(k)));
+        if(hit){ sw.classList.add('on'); sw.setAttribute('aria-checked','true'); }
+      });
+      updateOnboardingPreview();
+      toast('Assessment inputs applied');
+    }catch(e){ toast('No assessment found'); }
+  }
+  qs('#useAssessment')?.addEventListener('click', applyAssessment);
+  qs('#resetDefaults')?.addEventListener('click', ()=>{ localStorage.removeItem('opento_assessment'); location.reload(); });
 }
 function startAgent(path){
   localStorage.setItem('opento_agent_started', '1');
@@ -720,6 +848,18 @@ function stateLabInit(){
 
 /* ---------- Router ---------- */
 document.addEventListener('DOMContentLoaded', ()=>{
+  function initMobileNav(){
+    const nav = qs('.nav'); if(!nav) return;
+    const actions = nav.querySelector('.actions'); if(!actions) return;
+    if(nav.querySelector('.menu-toggle')) return;
+    const btn = document.createElement('button'); btn.className='menu-toggle'; btn.textContent='Menu'; btn.setAttribute('aria-expanded','false'); btn.setAttribute('aria-label','Open menu');
+    nav.insertBefore(btn, actions);
+    btn.addEventListener('click', ()=>{
+      const open = nav.classList.toggle('open'); btn.setAttribute('aria-expanded', String(open));
+    });
+  }
+  initMobileNav();
+
   // landing
   if(qs('.ticker')) startTicker();
   if(qs('.typewriter')) typeWriter(qs('.typewriter'));
