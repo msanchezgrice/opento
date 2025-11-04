@@ -17,32 +17,47 @@ This guide covers configuring Clerk authentication for production deployment on 
 
 ## Required Clerk Dashboard Configuration
 
-### Step 1: Configure Redirect URLs
+### Step 1: Configure Redirect URLs (Most Important!)
 
-Go to: **https://dashboard.clerk.com** → Your Opento App → **Paths**
+Go to: **https://dashboard.clerk.com** → Your Opento App → **Paths** → **Redirect URLs**
 
-#### Sign-up Redirect URL
-After successful sign-up, redirect to:
+⚠️ **Note**: These are different from "Component paths". You need to find the "Redirect URLs" section, not "Component paths".
+
+#### Allowed Redirect URLs
+Add these patterns (these are where Clerk can redirect users after auth):
+```
+http://localhost:8000/*
+https://opento-psi.vercel.app/*
+https://opento.co/*
+https://*.opento.co/*
+```
+
+#### After Sign-up Redirect URL
 ```
 /onboarding.html
 ```
 
-#### Sign-in Redirect URL  
-After successful sign-in, redirect to:
+#### After Sign-in Redirect URL  
 ```
 /inbox.html
 ```
 
-#### After Sign-out URL
-After sign-out, redirect to:
+#### After Sign-out Redirect URL
 ```
 /index.html
 ```
 
-#### Home URL (optional)
-```
-/index.html
-```
+**Note**: Your code already sets these in `sign-in.html` and `sign-up.html` using `afterSignInUrl` and `afterSignUpUrl`, but Clerk dashboard settings provide fallback/default behavior.
+
+### Step 1b: Component Paths (Optional - You're Using Account Portal)
+
+The Component paths section shows:
+- Sign-in: `https://accounts.opento.co/sign-in`
+- Sign-up: `https://accounts.opento.co/sign-up`
+
+**This is fine** - Clerk's Account Portal is used when users navigate directly to Clerk URLs. Since you're embedding Clerk components in your own pages (`/sign-in.html`, `/sign-up.html`), this setting doesn't affect your main flow.
+
+However, if you want users to stay on your domain entirely, you can change Component paths to use "application domain" instead of "Account Portal".
 
 ---
 
@@ -189,18 +204,25 @@ Subscribe to events:
 
 ## Summary Checklist
 
-- [ ] Configure redirect URLs in Clerk dashboard:
-  - [ ] Sign-up → `/onboarding.html`
-  - [ ] Sign-in → `/inbox.html`
-  - [ ] Sign-out → `/index.html`
-- [ ] Add production domain(s) to Clerk:
+✅ **Component Paths** - Already correct (using Account Portal is fine)
+- [x] Component paths set to Account Portal (doesn't affect your embedded components)
+
+⚠️ **Action Required:**
+- [ ] Configure **Allowed Redirect URLs** in Clerk dashboard → Paths → Redirect URLs:
+  - [ ] Add `http://localhost:8000/*`
+  - [ ] Add `https://opento-psi.vercel.app/*`
+  - [ ] Add `https://opento.co/*` (if custom domain)
+- [ ] Set default redirect URLs (fallbacks):
+  - [ ] After sign-up → `/onboarding.html`
+  - [ ] After sign-in → `/inbox.html`
+  - [ ] After sign-out → `/index.html`
+- [ ] Add production domain(s) to Clerk → Domains:
   - [ ] `https://opento-psi.vercel.app`
   - [ ] `https://opento.co` (if custom domain)
 - [ ] Verify Vercel environment variables:
   - [ ] `CLERK_SECRET_KEY` is set for Production
-- [ ] Test sign-up flow
-- [ ] Test sign-in flow
-- [ ] Test sign-out flow
+- [ ] Test sign-up flow (should redirect to `/onboarding.html`)
+- [ ] Test sign-in flow (should redirect to `/inbox.html`)
 - [ ] (Optional) Set up webhook for Supabase sync
 
 ---
