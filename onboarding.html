@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Opento — Onboarding</title>
+  <title>Opento — Build Your Agent</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -12,72 +12,304 @@
       <div class="brand"><img class="brand-logo" src="assets/logo.svg" alt=""><div class="brand-name">Opento</div></div>
       <div class="goal"><span class="small">You're</span> <div class="meter"><div class="fill" style="width:0;"></div></div> <span class="small">to earning</span></div>
       <div class="progress" style="flex:1; height:8px; background:#eef2ff; border-radius:999px; overflow:hidden;"><div class="bar" style="height:100%; width:0; background:linear-gradient(90deg, #2D6FFF, #2EE6A6);"></div></div>
-      <div class="step-indicator small">Step 1 of 3</div>
+      <div class="step-indicator small">Step 1 of 6</div>
     </div>
   </div>
 
-  <div class="container section">
-    <h2>How do you want to set up your agent?</h2>
-    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
-      <button id="useAssessment" class="btn small">Use assessment inputs</button>
-      <button id="resetDefaults" class="btn small gray">Reset to defaults</button>
-    </div>
-    <div class="card quickstart-card">
-      <div>
-        <h3>QuickStart (recommended)</h3>
-        <p class="small" id="quickStartDesc">Default rules tuned for performance marketers: Growth audits + creative QA ON, $75/30m consult floor, $12/5m async sprints, Mon–Thu 11a–4p CT, Anonymous first, Auto-accept fast async tasks.</p>
-      </div>
-      <button id="quickStart" class="btn">Start QuickStart</button>
-    </div>
-
+  <div class="container section onboarding-container">
     <div class="wizard">
-      <div>
-        <div class="step">
-          <h3>Custom — What are you open to?</h3>
-          <div class="option"><div><strong>Growth audits & consults</strong><div class="small">Deep dives on CAC, retention, and channel mix.</div></div><div class="switch on" data-label="Growth audits"></div></div>
-          <div class="option"><div><strong>Campaign setup & optimization</strong><div class="small">Hands-on experiment sprints + reporting clean-up.</div></div><div class="switch on" data-label="Campaign optimization"></div></div>
-          <div class="option"><div><strong>Fractional retainers</strong><div class="small">Week-over-week performance support.</div></div><div class="switch on" data-label="Fractional retainers"></div></div>
-          <div class="option"><div><strong>Data labeling & QA</strong><div class="small">Tagging hooks, funnel QA, event taxonomy clean-up.</div></div><div class="switch on" data-label="Data labeling"></div></div>
-          <div style="display:flex; gap:10px; margin-top:12px;"><button class="btn gray" data-back>Back</button><button class="btn" data-next>Continue</button></div>
-        </div>
-
-        <div class="step">
-          <h3>Set floors & availability</h3>
+      <!-- Step 1: Tell us about yourself -->
+      <div class="step" data-step="1">
+        <div class="step-content">
+          <div class="step-header">
+            <div class="step-number">1</div>
+            <h2>Tell us about yourself</h2>
+            <p class="sub">Help us understand your background so we can match you with the right opportunities.</p>
+          </div>
           <div class="inputs">
-            <label class="input"><span>Consult minimum ($ per 30 minutes)</span><input id="floor" type="range" min="30" max="200" step="5" value="75" aria-label="Consult minimum per 30 minutes"><span id="floorVal" class="chip" aria-live="polite">$75</span><div class="small">Auto-declines briefs below this.</div></label>
-            <label class="input"><span>Async sprint minimum ($ per 5 minutes)</span><input id="microfloor" type="range" min="5" max="40" step="1" value="12" aria-label="Async sprint minimum per 5 minutes"><span id="microVal" class="chip" aria-live="polite">$12</span></label>
-            <label class="input"><span>Weekly hours target</span><input id="hours" type="range" min="0" max="20" value="6" aria-label="Weekly hours target"><span id="hoursVal" class="chip" aria-live="polite">6 hrs</span></label>
-            <label class="input"><span>Auto-book windows</span><select id="autoWindow"><option>Mon–Thu 11a–4p CT</option><option>Mon–Fri Lunch hours</option><option>Tue & Thu Evenings</option></select><div class="small">Your Rep only books in these windows.</div></label>
+            <label class="input">
+              <span>Years of experience</span>
+              <select id="years" required>
+                <option value="">Select years...</option>
+                <option value="0">0 - Just starting</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6" selected>6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="12">12</option>
+                <option value="15">15</option>
+                <option value="18">18</option>
+                <option value="20">20+</option>
+              </select>
+            </label>
+            <label class="input">
+              <span>Location (city, region)</span>
+              <input id="location" type="text" list="locList" placeholder="e.g., Austin, TX" required>
+              <div class="small muted">Your timezone helps with scheduling</div>
+            </label>
+            <label class="input" style="grid-column: 1 / -1;">
+              <span>Your skills</span>
+              <input id="skills" type="text" list="skillsList" placeholder="e.g., performance marketing, paid social, lifecycle" required>
+              <div class="small muted">Comma-separated. We'll match opportunities based on these.</div>
+            </label>
           </div>
-          <div style="display:flex; gap:10px; margin-top:12px;"><button class="btn gray" data-back>Back</button><button class="btn" data-next>Continue</button></div>
-        </div>
-
-        <div class="step">
-          <h3>Consent & reveal rules</h3>
-          <div class="scope">
-            <div class="item allow">✔ Share: role, anonymized KPIs, case studies</div>
-            <div class="item deny">✖ Hide: employer names, exact spend history</div>
+          <datalist id="locList">
+            <option>Austin, TX</option>
+            <option>San Francisco, CA</option>
+            <option>New York, NY</option>
+            <option>Seattle, WA</option>
+            <option>Los Angeles, CA</option>
+            <option>Chicago, IL</option>
+            <option>Boston, MA</option>
+            <option>Denver, CO</option>
+            <option>London, UK</option>
+            <option>Berlin, DE</option>
+            <option>Toronto, ON</option>
+            <option>Remote</option>
+          </datalist>
+          <datalist id="skillsList">
+            <option>performance marketing</option>
+            <option>paid social</option>
+            <option>lifecycle</option>
+            <option>email marketing</option>
+            <option>seo</option>
+            <option>sem</option>
+            <option>content</option>
+            <option>product management</option>
+            <option>growth</option>
+            <option>user research</option>
+            <option>design</option>
+            <option>data analysis</option>
+            <option>ai</option>
+            <option>engineering</option>
+            <option>copywriting</option>
+            <option>sales</option>
+            <option>consulting</option>
+            <option>qa</option>
+          </datalist>
+          <div class="step-actions">
+            <button class="btn primary" data-next>Continue</button>
           </div>
-          <div class="option" style="margin-top:12px;"><div><strong>Anonymous first</strong><div class="small">Identity reveals on accept + escrow.</div></div><div class="switch on" data-label="Anonymous first"></div></div>
-          <div class="option"><div><strong>Consent reminders</strong><div class="small">Show what's shared before each accept.</div></div><div class="switch on" data-label="Consent reminders"></div></div>
-          <div style="display:flex; gap:10px; margin-top:12px;"><button class="btn gray" data-back>Back</button><button class="btn" data-finish>Finish & start agent</button></div>
         </div>
       </div>
 
-      <div class="panel">
-        <div class="badge"><span class="dot"></span> Preview</div>
-        <div class="cards preview-cards">
-          <div class="card preview-card"><div class="metric" data-preview="floor">$75</div><div class="small"><span title="Minimum price for 30‑minute live consults.">i</span> 30-min consult floor</div></div>
-          <div class="card preview-card"><div class="metric" data-preview="micro">$12 / 5m</div><div class="small"><span title="Minimum price for 5‑minute async sprints.">i</span> Async sprint floor</div></div>
-          <div class="card preview-card"><div class="metric" data-preview="window">Mon–Thu 11a–4p CT</div><div class="small"><span title="Times your Rep may auto‑book.">i</span> Auto-book window</div></div>
-          <div class="card preview-card"><div class="metric" data-preview="hours">6 hrs / wk</div><div class="small"><span title="Weekly hours target used for projections.">i</span> Weekly hours target</div></div>
-          <div class="card preview-card"><div class="metric" id="estMonthly" aria-live="polite">$0 / mo</div><div class="small"><span title="Directional projection; assumes all automations on.">i</span> Total estimated (aspirational)</div></div>
+      <!-- Step 2: Your online presence -->
+      <div class="step" data-step="2">
+        <div class="step-content">
+          <div class="step-header">
+            <div class="step-number">2</div>
+            <h2>Your online presence</h2>
+            <p class="sub">Optional: Add your professional profiles to boost trust and match quality.</p>
+          </div>
+          <div class="inputs">
+            <label class="input">
+              <span>LinkedIn URL (optional)</span>
+              <input id="linkedin" type="url" placeholder="https://www.linkedin.com/in/you">
+              <div class="small muted">Signals professional presence</div>
+            </label>
+            <label class="input">
+              <span>Twitter / X URL (optional)</span>
+              <input id="twitter" type="url" placeholder="https://x.com/you">
+              <div class="small muted">Shows thought leadership</div>
+            </label>
+            <label class="input">
+              <span>Instagram URL (optional)</span>
+              <input id="instagram" type="url" placeholder="https://instagram.com/you">
+              <div class="small muted">For creator & brand collabs</div>
+            </label>
+          </div>
+          <div class="step-actions">
+            <button class="btn gray" data-back>Back</button>
+            <button class="btn primary" data-next>Continue</button>
+          </div>
         </div>
-        <div class="chips" id="previewFocus"></div>
-        <p class="small" id="previewSummary">Your Scout will watch for growth audits, campaign cleanups, and async creative QA within these rules.</p>
+      </div>
+
+      <!-- Step 3: Your availability -->
+      <div class="step" data-step="3">
+        <div class="step-content">
+          <div class="step-header">
+            <div class="step-number">3</div>
+            <h2>Your availability</h2>
+            <p class="sub">How many hours per week would you like to dedicate to opportunities?</p>
+          </div>
+          <div class="inputs">
+            <label class="input availability-slider">
+              <span>Weekly hours target</span>
+              <input id="hours" type="range" min="0" max="20" value="6" aria-label="Weekly hours target">
+              <span id="hoursVal" class="chip large-chip" aria-live="polite">6 hrs / week</span>
+              <div class="small muted">Don't worry, you can adjust this anytime</div>
+            </label>
+            <div class="card estimate-card">
+              <div class="small muted">Potential monthly earnings</div>
+              <div id="earningsEstimate" class="estimate-value">$0</div>
+              <div class="small muted">Based on your profile and market rates</div>
+            </div>
+          </div>
+          <div class="step-actions">
+            <button class="btn gray" data-back>Back</button>
+            <button class="btn primary" data-next>Continue</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: What are you open to? -->
+      <div class="step" data-step="4">
+        <div class="step-content">
+          <div class="step-header">
+            <div class="step-number">4</div>
+            <h2>What are you open to?</h2>
+            <p class="sub">Select the types of work you'd like your agent to find for you.</p>
+          </div>
+          <div class="options-grid">
+            <div class="option-card" data-category="audits">
+              <div class="option-card-header">
+                <div class="switch on" data-label="Growth audits"></div>
+                <h3>Growth audits & consults</h3>
+              </div>
+              <p class="small">30-minute deep dives on CAC, retention, and channel mix goals.</p>
+            </div>
+            <div class="option-card" data-category="campaigns">
+              <div class="option-card-header">
+                <div class="switch on" data-label="Campaign optimization"></div>
+                <h3>Campaign setup & optimization</h3>
+              </div>
+              <p class="small">Hands-on experiment sprints and reporting clean-up.</p>
+            </div>
+            <div class="option-card" data-category="retainers">
+              <div class="option-card-header">
+                <div class="switch on" data-label="Fractional retainers"></div>
+                <h3>Fractional retainers</h3>
+              </div>
+              <p class="small">8–12 hr/week support with async updates.</p>
+            </div>
+            <div class="option-card" data-category="labeling">
+              <div class="option-card-header">
+                <div class="switch on" data-label="Data labeling"></div>
+                <h3>Data labeling & QA</h3>
+              </div>
+              <p class="small">Tagging hooks, funnel QA, event taxonomy clean-up.</p>
+            </div>
+          </div>
+          <div class="step-actions">
+            <button class="btn gray" data-back>Back</button>
+            <button class="btn primary" data-next>Continue</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5: Set your rates -->
+      <div class="step" data-step="5">
+        <div class="step-content">
+          <div class="step-header">
+            <div class="step-number">5</div>
+            <h2>Set your rates</h2>
+            <p class="sub">Define your minimum rates and auto-book windows. Your agent will auto-decline anything below these.</p>
+          </div>
+          <div class="inputs">
+            <label class="input">
+              <span>Consult minimum ($ per 30 minutes)</span>
+              <input id="floor" type="range" min="30" max="200" step="5" value="75" aria-label="Consult minimum per 30 minutes">
+              <span id="floorVal" class="chip" aria-live="polite">$75</span>
+              <div class="small muted">Auto-declines briefs below this</div>
+            </label>
+            <label class="input">
+              <span>Async sprint minimum ($ per 5 minutes)</span>
+              <input id="microfloor" type="range" min="5" max="40" step="1" value="12" aria-label="Async sprint minimum per 5 minutes">
+              <span id="microVal" class="chip" aria-live="polite">$12</span>
+              <div class="small muted">For quick tasks and QA work</div>
+            </label>
+            <label class="input">
+              <span>Auto-book windows</span>
+              <select id="autoWindow">
+                <option>Mon–Thu 11a–4p CT</option>
+                <option>Mon–Fri Lunch hours</option>
+                <option>Tue & Thu Evenings</option>
+              </select>
+              <div class="small muted">Your Rep only books in these windows</div>
+            </label>
+          </div>
+          <div class="step-actions">
+            <button class="btn gray" data-back>Back</button>
+            <button class="btn primary" data-next>Continue</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 6: Privacy preferences -->
+      <div class="step" data-step="6">
+        <div class="step-content">
+          <div class="step-header">
+            <div class="step-number">6</div>
+            <h2>Privacy & consent</h2>
+            <p class="sub">Control what you share and when your identity is revealed.</p>
+          </div>
+          <div class="privacy-section">
+            <div class="scope-card">
+              <h3>What will be shared</h3>
+              <div class="scope">
+                <div class="item allow">✔ Share: role, anonymized KPIs, case studies</div>
+                <div class="item deny">✖ Hide: employer names, exact spend history</div>
+              </div>
+            </div>
+            <div class="option-card privacy-card">
+              <div class="option-card-header">
+                <div class="switch on" data-label="Anonymous first"></div>
+                <h3>Anonymous first</h3>
+              </div>
+              <p class="small">Identity reveals only after you accept + escrow is confirmed.</p>
+            </div>
+            <div class="option-card privacy-card">
+              <div class="option-card-header">
+                <div class="switch on" data-label="Consent reminders"></div>
+                <h3>Consent reminders</h3>
+              </div>
+              <p class="small">Show what's shared before each accept so you stay in control.</p>
+            </div>
+          </div>
+          <div class="step-actions">
+            <button class="btn gray" data-back>Back</button>
+            <button class="btn primary large-btn" data-finish>Build my agent</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview Panel (Sticky on desktop) -->
+    <div class="preview-panel">
+      <div class="badge"><span class="dot"></span> Live Preview</div>
+      <div class="preview-content">
+        <div class="preview-card-small">
+          <div class="small muted">Profile</div>
+          <div id="previewYears" class="preview-value">—</div>
+          <div id="previewLocation" class="preview-value">—</div>
+          <div id="previewSkills" class="preview-chips"></div>
+        </div>
+        <div class="preview-card-small">
+          <div class="small muted">Rates</div>
+          <div id="previewFloor" class="preview-value">$75 / 30m</div>
+          <div id="previewMicro" class="preview-value">$12 / 5m</div>
+        </div>
+        <div class="preview-card-small">
+          <div class="small muted">Availability</div>
+          <div id="previewHours" class="preview-value">6 hrs / week</div>
+          <div id="previewWindow" class="preview-value">Mon–Thu 11a–4p CT</div>
+        </div>
+        <div class="preview-card-highlight">
+          <div class="small muted">Monthly estimate</div>
+          <div id="previewEstimate" class="preview-estimate">$0</div>
+        </div>
+        <div id="previewCategories" class="preview-chips-list"></div>
       </div>
     </div>
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>

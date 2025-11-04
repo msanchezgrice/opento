@@ -242,75 +242,132 @@ function testDriveInit(){
 }
 
 /* ---------- Onboarding ---------- */
+function calculateEarningsEstimate(){
+  // Get all form values
+  const years = Number(qs('#years')?.value || 6);
+  const location = (qs('#location')?.value || '').toLowerCase();
+  const skills = (qs('#skills')?.value || '').toLowerCase();
+  const hasLinkedIn = !!(qs('#linkedin')?.value || '').trim();
+  const hasTwitter = !!(qs('#twitter')?.value || '').trim();
+  const hasInstagram = !!(qs('#instagram')?.value || '').trim();
+  const hours = Number(qs('#hours')?.value || 6);
+  const floorVal = Number(qs('#floor')?.value || 75);
+  const microVal = Number(qs('#microfloor')?.value || 12);
+
+  // Calculate base hourly rate from experience
+  let baseHr = 25 + years * 3;
+  baseHr = Math.max(30, Math.min(baseHr, 140));
+
+  // Skill scoring
+  const highTier = ['engineering','ai','ml','data science','strategy'];
+  const coreTier = ['performance marketing','paid social','growth','product management','ux','design','seo','sem','email','lifecycle','content','analytics','copywriting','sales'];
+  let skillScore = 0;
+  coreTier.forEach(k=>{ if(skills.includes(k)) skillScore += 4; });
+  highTier.forEach(k=>{ if(skills.includes(k)) skillScore += 6; });
+  skillScore = Math.min(skillScore, 30);
+
+  // Social presence boost
+  const socialBoost = Math.min(10, (hasLinkedIn?6:0) + (hasTwitter?2:0) + (hasInstagram?2:0));
+
+  // Geographic coefficient
+  const tier1 = /(san francisco|sf|new york|nyc|seattle|london)/;
+  const tier2 = /(austin|los angeles|la|boston|denver|berlin|toronto|chicago)/;
+  const geoCoef = tier1.test(location) ? 1.15 : tier2.test(location) ? 1.07 : 1.0;
+
+  // Utilization factor
+  const util = hours >= 12 ? 1.0 : hours >= 8 ? 0.9 : hours >= 4 ? 0.8 : 0.7;
+
+  // Get enabled categories
+  const enabled = qsa('.wizard .switch.on').map(sw=> sw.dataset.label).filter(Boolean);
+  const consultEnabled = ['Growth audits','Campaign optimization','Fractional retainers'].some(lbl=> enabled.includes(lbl));
+  const microEnabled = enabled.includes('Data labeling');
+
+  const consultRateHr = floorVal * 2;
+  const microRateHr = microVal * 12;
+  let blendedRate = 0;
+  if(consultEnabled && microEnabled){ blendedRate = consultRateHr*0.6 + microRateHr*0.4; }
+  else if(consultEnabled){ blendedRate = consultRateHr; }
+  else if(microEnabled){ blendedRate = microRateHr; }
+  else { blendedRate = Math.max(consultRateHr, microRateHr) * 0.6; }
+
+  const hourly = (baseHr + skillScore + socialBoost) * geoCoef;
+  const finalRate = Math.max(hourly, blendedRate * 0.8); // Use higher of profile-based or rate-based
+  const monthly = Math.round(finalRate * Math.max(0, hours) * 4 * util * 1.05);
+
+  return monthly;
+}
+
 function updateOnboardingPreview(){
   if(!qs('.wizard')) return;
-  const floorInput = qs('#floor');
-  const microInput = qs('#microfloor');
-  const hoursInput = qs('#hours');
-  const windowSelect = qs('#autoWindow');
 
-  const floorVal = Number(floorInput?.value ?? demoAgent.onboarding.floor);
-  const microVal = Number(microInput?.value ?? demoAgent.onboarding.microFloor);
-  const hoursVal = Number(hoursInput?.value ?? demoAgent.onboarding.hours);
-  const windowVal = windowSelect?.value || demoAgent.onboarding.window;
+  // Update profile preview
+  const years = qs('#years')?.value;
+  const location = qs('#location')?.value;
+  const skills = qs('#skills')?.value;
+
+  if(years){
+    const yearsText = years === '0' ? 'Starting out' : years === '20' ? '20+ years exp.' : `${years} years exp.`;
+    setText('#previewYears', yearsText);
+  }
+  if(location){
+    setText('#previewLocation', location);
+  }
+  if(skills){
+    const skillsList = skills.split(',').map(s => s.trim()).filter(Boolean).slice(0, 3);
+    const skillsEl = qs('#previewSkills');
+    if(skillsEl){
+      skillsEl.innerHTML = skillsList.length
+        ? skillsList.map(s => `<div class="chip small">${s}</div>`).join('')
+        : '';
+    }
+  }
+
+  // Update rates
+  const floorVal = Number(qs('#floor')?.value || 75);
+  const microVal = Number(qs('#microfloor')?.value || 12);
+  const hoursVal = Number(qs('#hours')?.value || 6);
+  const windowVal = qs('#autoWindow')?.value || 'Mon–Thu 11a–4p CT';
 
   setText('#floorVal', formatUsd(floorVal));
   setText('#microVal', formatUsd(microVal));
-  setText('#hoursVal', `${hoursVal} hrs`);
+  setText('#hoursVal', `${hoursVal} hrs / week`);
 
-  setText('[data-preview="floor"]', formatUsd(floorVal));
-  setText('[data-preview="micro"]', `${formatUsd(microVal)} / 5m`);
-  setText('[data-preview="hours"]', `${hoursVal} hrs / wk`);
-  setText('[data-preview="window"]', windowVal);
+  setText('#previewFloor', `${formatUsd(floorVal)} / 30m`);
+  setText('#previewMicro', `${formatUsd(microVal)} / 5m`);
+  setText('#previewHours', `${hoursVal} hrs / week`);
+  setText('#previewWindow', windowVal);
 
-  const enabled = qsa('.wizard .switch').filter(sw=> sw.classList.contains('on')).map(sw=> sw.dataset.label).filter(Boolean);
-  const focusHolder = qs('#previewFocus');
-  if(focusHolder){
-    focusHolder.innerHTML = enabled.length
-      ? enabled.map(c=>`<div class="chip">${c}</div>`).join('')
-      : '<div class="small muted">Toggle categories to teach your agent.</div>';
-  }
-  const summary = qs('#previewSummary');
-  if(summary){
-    summary.textContent = enabled.length
-      ? `Your Scout will watch for ${enabled.join(', ')} within these rules.`
-      : 'Choose at least one category so your Scout knows what to surface.';
+  // Update categories
+  const enabled = qsa('.wizard .switch.on').map(sw=> sw.dataset.label).filter(Boolean);
+  const categoriesEl = qs('#previewCategories');
+  if(categoriesEl){
+    categoriesEl.innerHTML = enabled.length
+      ? enabled.map(c => `<div class="chip">${c}</div>`).join('')
+      : '<div class="small muted">Select categories in step 4</div>';
   }
 
-  // Estimate potential (aspirational) — shows impact of more categories & hours
-  const estNode = qs('#estMonthly');
-  if(estNode){
-    const consultEnabled = ['Growth audits','Campaign optimization','Fractional retainers'].some(lbl=> enabled.includes(lbl));
-    const microEnabled = enabled.includes('Data labeling');
-    const consultRateHr = floorVal * 2; // $/hr from $/30m
-    const microRateHr = microVal * 12;  // $/hr from $/5m
-    let blendedRate = 0;
-    if(consultEnabled && microEnabled){ blendedRate = consultRateHr*0.6 + microRateHr*0.4; }
-    else if(consultEnabled){ blendedRate = consultRateHr; }
-    else if(microEnabled){ blendedRate = microRateHr; }
-    else { blendedRate = Math.max(consultRateHr, microRateHr) * 0.6; }
+  // Update earnings estimate
+  const estimate = calculateEarningsEstimate();
+  const estNode = qs('#previewEstimate');
+  const estNodeInStep = qs('#earningsEstimate');
 
-    const categorySet = ['Growth audits','Campaign optimization','Fractional retainers','Data labeling'];
-    const categoriesCount = categorySet.filter(lbl=> enabled.includes(lbl)).length;
-    let matchMultiplier = 0.6 + 0.1 * categoriesCount; // 0.6–1.0 based on enabled breadth
-    if(enabled.includes('Anonymous first')) matchMultiplier += 0.05; // trust signal bump
-    if(enabled.includes('Consent reminders')) matchMultiplier += 0.05;
-    matchMultiplier = Math.min(1.1, matchMultiplier); // soft cap
-
-    const estWeekly = Math.round(hoursVal * blendedRate * matchMultiplier);
-    const estMonthly = estWeekly * 4;
-    // animate number change
-    const prev = Number(estNode.dataset.val || 0);
-    const dur = 500; const t0 = performance.now();
+  const animateValue = (node) => {
+    if(!node) return;
+    const prev = Number(node.dataset.val || 0);
+    const dur = 500;
+    const t0 = performance.now();
     function tick(t){
       const p = Math.min(1, (t - t0) / dur);
-      const cur = Math.round(prev + (estMonthly - prev) * p);
-      estNode.textContent = formatUsd(cur) + ' / mo';
+      const cur = Math.round(prev + (estimate - prev) * p);
+      node.textContent = formatUsd(cur);
       if(p < 1) requestAnimationFrame(tick);
     }
     requestAnimationFrame(tick);
-    estNode.dataset.val = String(estMonthly);
-  }
+    node.dataset.val = String(estimate);
+  };
+
+  animateValue(estNode);
+  animateValue(estNodeInStep);
 }
 
 function bindSwitches(){
@@ -319,86 +376,143 @@ function bindSwitches(){
     const setState = (on)=>{
       sw.classList.toggle('on', on);
       sw.setAttribute('aria-checked', on);
+      // Update parent card active state
+      const card = sw.closest('.option-card');
+      if(card){
+        card.classList.toggle('active', on);
+      }
     };
     setState(sw.classList.contains('on'));
     sw.setAttribute('role', 'switch');
     sw.setAttribute('tabindex', '0');
     sw.setAttribute('aria-label', `${label} toggle`);
-    sw.addEventListener('click', ()=>{
+
+    const toggle = ()=>{
       const next = !sw.classList.contains('on');
       setState(next);
       track('Onboarding Toggle', {label, on: next});
       updateOnboardingPreview();
+    };
+
+    sw.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      toggle();
     });
     sw.addEventListener('keypress', (e)=>{
       if(e.key==='Enter' || e.key===' '){
         e.preventDefault();
-        const next = !sw.classList.contains('on');
-        setState(next);
-        track('Onboarding Toggle', {label, on: next});
-        updateOnboardingPreview();
+        toggle();
       }
     });
+
+    // Make option-card clickable
+    const card = sw.closest('.option-card');
+    if(card){
+      card.addEventListener('click', ()=>{
+        toggle();
+      });
+    }
   });
 }
 
 function wizardInit(){
   const steps = qsa('.wizard .step'); if(steps.length===0) return;
   let idx=0;
+
+  function validateStep(stepIndex){
+    if(stepIndex === 0){
+      // Step 1: Validate required fields
+      const years = qs('#years')?.value;
+      const location = qs('#location')?.value;
+      const skills = qs('#skills')?.value;
+
+      if(!years || !location || !skills || skills.trim().length === 0){
+        toast('Please fill in all required fields');
+        return false;
+      }
+    }
+    // URL validation for step 2
+    if(stepIndex === 1){
+      const linkedin = qs('#linkedin')?.value;
+      const twitter = qs('#twitter')?.value;
+      const instagram = qs('#instagram')?.value;
+
+      const isValidUrl = (u) => {
+        if(!u || u.trim() === '') return true; // optional fields
+        try{ const x=new URL(u); return /^https?:$/.test(x.protocol); }catch(e){ return false; }
+      };
+
+      if(!isValidUrl(linkedin) || !isValidUrl(twitter) || !isValidUrl(instagram)){
+        toast('Please enter valid URLs (or leave blank)');
+        return false;
+      }
+    }
+    return true;
+  }
+
   function show(i){
     idx=Math.max(0,Math.min(i,steps.length-1));
     steps.forEach((s,k)=>s.style.display = (k===idx?'block':'none'));
     const ind=qs('.step-indicator'); if(ind) ind.textContent = `Step ${idx+1} of ${steps.length}`;
     const bar=qs('.progress .bar'); if(bar){ const pct = steps.length>1 ? (idx)/(steps.length-1) : 1; bar.style.width = `${pct*100}%`; }
     updateOnboardingPreview();
+    window.scrollTo({top: 0, behavior: 'smooth'});
   }
-  qsa('[data-next]').forEach(b=>b.addEventListener('click', ()=>{ show(idx+1); track('Onboarding Next', {step: idx+1}); }));
-  qsa('[data-back]').forEach(b=>b.addEventListener('click', ()=> show(idx-1)));
-  qsa('[data-finish]').forEach(b=>b.addEventListener('click', ()=>{ startAgent('custom'); }));
 
+  qsa('[data-next]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      if(validateStep(idx)){
+        show(idx+1);
+        track('Onboarding Next', {step: idx+1});
+      }
+    });
+  });
+
+  qsa('[data-back]').forEach(b=>b.addEventListener('click', ()=> show(idx-1)));
+  qsa('[data-finish]').forEach(b=>b.addEventListener('click', ()=>{ saveOnboardingData(); startAgent('custom'); }));
+
+  // Bind input listeners for real-time updates
+  qs('#years')?.addEventListener('change', updateOnboardingPreview);
+  qs('#location')?.addEventListener('input', updateOnboardingPreview);
+  qs('#skills')?.addEventListener('input', updateOnboardingPreview);
+  qs('#linkedin')?.addEventListener('input', updateOnboardingPreview);
+  qs('#twitter')?.addEventListener('input', updateOnboardingPreview);
+  qs('#instagram')?.addEventListener('input', updateOnboardingPreview);
+  qs('#hours')?.addEventListener('input', updateOnboardingPreview);
   qs('#floor')?.addEventListener('input', updateOnboardingPreview);
   qs('#microfloor')?.addEventListener('input', updateOnboardingPreview);
-  qs('#hours')?.addEventListener('input', updateOnboardingPreview);
   qs('#autoWindow')?.addEventListener('change', updateOnboardingPreview);
 
   bindSwitches();
   show(0);
+}
 
-  // Apply assessment defaults
-  function applyAssessment(){
-    try{
-      const saved = JSON.parse(localStorage.getItem('opento_assessment')||'{}');
-      if(!saved) return;
-      // Suggest floors from experience tiers
-      const years = Number(saved.years||6);
-      const floor = Math.min(200, Math.max(50, 60 + years*2));
-      const micro = Math.min(40, Math.max(8, 10 + Math.round(years/2)));
-      const hours = Number(saved.hrs||6);
-      const floorInput = qs('#floor'); const microInput = qs('#microfloor'); const hoursInput = qs('#hours');
-      if(floorInput){ floorInput.value = String(floor); }
-      if(microInput){ microInput.value = String(micro); }
-      if(hoursInput){ hoursInput.value = String(hours); }
+function saveOnboardingData(){
+  const data = {
+    years: qs('#years')?.value,
+    location: qs('#location')?.value,
+    skills: (qs('#skills')?.value || '').split(',').map(s => s.trim()).filter(Boolean),
+    linkedin: qs('#linkedin')?.value,
+    twitter: qs('#twitter')?.value,
+    instagram: qs('#instagram')?.value,
+    hours: Number(qs('#hours')?.value || 6),
+    floor: Number(qs('#floor')?.value || 75),
+    microfloor: Number(qs('#microfloor')?.value || 12),
+    window: qs('#autoWindow')?.value,
+    categories: qsa('.wizard .switch.on').map(sw=> sw.dataset.label).filter(Boolean),
+    anon: qsa('.wizard .switch[data-label="Anonymous first"]')[0]?.classList.contains('on'),
+    consent: qsa('.wizard .switch[data-label="Consent reminders"]')[0]?.classList.contains('on')
+  };
 
-      const skills = Array.isArray(saved.skills)? saved.skills : [];
-      // map skills to categories
-      const map = {
-        'Growth audits': ['performance marketing','growth','seo','sem','analytics','consulting','strategy'],
-        'Campaign optimization': ['paid social','email','lifecycle','content','copywriting'],
-        'Fractional retainers': ['product management','engineering','design','ux','sales'],
-        'Data labeling': ['qa','label','data','ai','ml']
-      };
-      qsa('.wizard .switch').forEach(sw=>{
-        const label = sw.dataset.label;
-        const keywords = map[label]||[];
-        const hit = skills.some(s=> keywords.some(k=> s.includes(k)));
-        if(hit){ sw.classList.add('on'); sw.setAttribute('aria-checked','true'); }
-      });
-      updateOnboardingPreview();
-      toast('Assessment inputs applied');
-    }catch(e){ toast('No assessment found'); }
-  }
-  qs('#useAssessment')?.addEventListener('click', applyAssessment);
-  qs('#resetDefaults')?.addEventListener('click', ()=>{ localStorage.removeItem('opento_assessment'); location.reload(); });
+  localStorage.setItem('opento_profile', JSON.stringify(data));
+  track('Onboarding Completed', {
+    years: data.years,
+    skills: data.skills.length,
+    categories: data.categories.length,
+    hasLinkedIn: !!data.linkedin,
+    hasTwitter: !!data.twitter,
+    hasInstagram: !!data.instagram
+  });
 }
 function startAgent(path){
   localStorage.setItem('opento_agent_started', '1');

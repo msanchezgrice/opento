@@ -13,7 +13,7 @@
       <div class="brand"><img class="brand-logo" src="assets/logo.svg" alt="Opento"><div class="brand-name">Opento</div></div>
       <div class="actions">
         <a class="btn" href="testimonials.html">Testimonials</a>
-        <a class="btn" href="onboarding.html">Start my agent</a>
+        <a class="btn" href="onboarding.html">Build my agent</a>
         <a class="btn primary" href="inbox.html">Open Inbox</a>
       </div>
     </div>
@@ -22,8 +22,7 @@
         <h1>Your agent works while you sleep.</h1>
         <p class="sub">It finds <span class="typewriter"></span> under your rules—just like Maya's growth agent.</p>
         <div class="cta">
-          <a class="btn primary" href="onboarding.html">Start my agent</a>
-          <button id="testDrive" class="btn ghost">Get earnings assessment</button>
+          <a class="btn primary" href="onboarding.html">Build my agent</a>
         </div>
         <div class="panel" style="margin-top:16px;">
           <div class="badge"><span class="dot"></span> Live from your agent</div>
@@ -128,68 +127,9 @@
   </div>
 
   <div class="section container" style="text-align:center;">
-    <a class="btn primary" href="onboarding.html">Start my agent</a>
+    <a class="btn primary" href="onboarding.html">Build my agent</a>
   </div>
 
-  <!-- Earnings assessment overlay -->
-  <div class="overlay" id="testOverlay">
-    <div class="box" role="dialog" aria-modal="true" aria-labelledby="assTitle">
-      <h3 id="assTitle">Get your earnings assessment</h3>
-      <p class="small">A directional estimate of what you could earn by enabling all automations. Inputs are optional and only used locally.</p>
-      <div class="wizard inputs" style="display:block; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:12px; margin-top:8px;">
-        <label class="input"><span>Years of experience</span>
-          <select id="assYears">
-            <option value="0">0</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6" selected>6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-            <option value="12">12</option>
-            <option value="15">15</option>
-            <option value="18">18</option>
-            <option value="20">20</option>
-            <option value="25">25</option>
-            <option value="30">30</option>
-          </select>
-        </label>
-        <label class="input"><span>Location (city, region)</span><input id="assLocation" type="text" list="assLocList" placeholder="Austin, TX"></label>
-        <label class="input"><span>Age (optional)</span><input id="assAge" type="number" min="16" max="100" placeholder="32"></label>
-        <label class="input" style="grid-column: 1 / -1;"><span>Skills (comma‑separated)</span><input id="assSkills" type="text" list="assSkillsList" placeholder="e.g., performance marketing, lifecycle, paid social"></label>
-        <label class="input"><span>LinkedIn URL</span><input id="assLinkedIn" type="url" placeholder="https://www.linkedin.com/in/you"><div class="small muted">Optional. Signals professional presence; used only for estimate.</div></label>
-        <label class="input"><span>Twitter / X URL</span><input id="assTwitter" type="url" placeholder="https://x.com/you"><div class="small muted">Optional. Signals professional presence; used only for estimate.</div></label>
-        <label class="input"><span>Instagram URL</span><input id="assInstagram" type="url" placeholder="https://instagram.com/you"><div class="small muted">Optional. Signals professional presence; used only for estimate.</div></label>
-        <label class="input"><span>Hours per week target</span><input id="assHours" type="range" min="0" max="20" value="6" aria-label="Hours per week target"><span id="assHoursVal" class="chip" aria-live="polite">6 hrs</span></label>
-      </div>
-      <datalist id="assLocList">
-        <option>Austin, TX</option><option>San Francisco, CA</option><option>New York, NY</option><option>Seattle, WA</option><option>Los Angeles, CA</option><option>Chicago, IL</option><option>Boston, MA</option><option>Denver, CO</option><option>London, UK</option><option>Berlin, DE</option><option>Toronto, ON</option><option>Remote</option>
-      </datalist>
-      <datalist id="assSkillsList">
-        <option>performance marketing</option><option>paid social</option><option>lifecycle</option><option>email marketing</option><option>seo</option><option>sem</option><option>content</option><option>product management</option><option>growth</option><option>user research</option><option>design</option><option>data analysis</option><option>ai</option><option>engineering</option><option>copywriting</option><option>sales</option><option>consulting</option><option>qa</option>
-      </datalist>
-      <div class="card ass-footer" style="margin-top:12px;">
-        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
-          <div>
-            <div class="small">Estimated monthly (all automations on)</div>
-            <div id="assEstimate" aria-live="polite" style="font-size:22px; font-weight:800;">$0 / mo</div>
-            <div class="small muted" id="assRange" style="margin-top:4px;">Typical range —</div>
-          </div>
-          <div style="display:flex; gap:10px;">
-            <button id="assCalc" class="btn gray" disabled>Recalculate</button>
-            <a id="assConfigure" class="btn primary" href="onboarding.html">Save and continue</a>
-          </div>
-        </div>
-      </div>
-      <div style="display:flex; gap:10px; margin-top:12px;">
-        <button id="testDriveClose" class="btn gray">Close</button>
-      </div>
-    </div>
-  </div>
 
   <div class="footer">© 2025 Opento — Prototype UI (v4.1)</div>
   <script src="script.js"></script>
