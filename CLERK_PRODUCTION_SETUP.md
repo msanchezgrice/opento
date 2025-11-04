@@ -10,8 +10,17 @@ This guide covers configuring Clerk authentication for production deployment on 
 - This key is safe to expose in frontend code
 
 ### Environment Variables (Vercel)
-✅ Already configured:
-- `CLERK_SECRET_KEY` = `sk_live_***` (from Clerk dashboard)
+⚠️ **ACTION REQUIRED:** Add these in Vercel Dashboard → Settings → Environment Variables:
+
+**Required:**
+- `CLERK_SECRET_KEY` = `sk_live_***` (from Clerk Dashboard → API Keys)
+
+**Optional (currently hardcoded in `config.js` as fallback):**
+- `CLERK_PUBLISHABLE_KEY` = `pk_live_Y2xlcmsub3BlbnRvLmNvJA` (can stay in config.js - it's public)
+- `SUPABASE_URL` = `https://axoycualmoxyqizjkuof.supabase.co` (currently hardcoded)
+- `SUPABASE_ANON_KEY` = `eyJ...` (currently hardcoded)
+
+See `VERCEL_ENV_SETUP.md` for detailed instructions.
 
 ---
 
@@ -34,18 +43,20 @@ https://*.opento.co/*
 
 #### After Sign-up Redirect URL
 ```
-/onboarding.html
+/onboarding
 ```
 
 #### After Sign-in Redirect URL  
 ```
-/inbox.html
+/inbox
 ```
 
 #### After Sign-out Redirect URL
 ```
-/index.html
+/
 ```
+
+**Note:** Since `vercel.json` has `cleanUrls: true`, URLs work without `.html` extension.
 
 **Note**: Your code already sets these in `sign-in.html` and `sign-up.html` using `afterSignInUrl` and `afterSignUpUrl`, but Clerk dashboard settings provide fallback/default behavior.
 
