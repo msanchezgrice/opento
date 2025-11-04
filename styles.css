@@ -226,6 +226,8 @@ small, .small { color: var(--muted); }
 .handle-handle { font-weight:600; color: rgba(219,227,255,0.85); margin-top:4px; }
 .handle-meta-row { margin-top:6px; font-size:14px; color:rgba(219,227,255,0.76); }
 .handle-hero .lead { color:#e6e9ff; max-width:580px; }
+.handle-open-to-text { font-size:20px; font-weight:600; margin-top:12px; margin-bottom:8px; }
+.handle-open-to-text .typewriter-handle { color:#2EE6A6; font-weight:700; border-right: 2px solid #2EE6A6; padding-right: 2px; }
 .handle-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
 .badge.ghost { background: rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.28); color:#fff; }
 .handle-metrics { display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px; }
