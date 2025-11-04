@@ -59,17 +59,22 @@
         return;
       }
 
+      // Verify key is valid before proceeding
+      if (!publishableKey || publishableKey.length < 10) {
+        throw new Error(`Invalid publishable key: "${publishableKey}". Expected key starting with pk_live_ or pk_test_`);
+      }
+      
       console.log('🔑 Initializing Clerk with key:', publishableKey.substring(0, 20) + '...');
+      console.log('🔍 Full key length:', publishableKey.length);
 
-      // Use Clerk's recommended script tag method with data-publishable-key
+      // Load Clerk script first, then initialize manually (more reliable than data attribute)
       const script = document.createElement('script');
-      script.setAttribute('data-publishable-key', publishableKey);
       script.src = 'https://accounts.clerk.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
       script.async = true;
       
       script.onload = async () => {
         try {
-          // Wait for Clerk to be available (it should auto-initialize with the data attribute)
+          // Wait for Clerk to be available
           let attempts = 0;
           while (!window.Clerk && attempts < 100) {
             await new Promise(resolve => setTimeout(resolve, 50));
@@ -80,8 +85,11 @@
             throw new Error('Clerk object not found after script load. Check network tab for errors loading clerk.browser.js');
           }
 
-          // Wait for Clerk to finish loading
-          await window.Clerk.load();
+          // Manually initialize Clerk with the key (don't rely on data attribute)
+          console.log('✅ Clerk script loaded, initializing with key...');
+          await window.Clerk.load({
+            publishableKey: publishableKey
+          });
 
           // Mount Clerk Sign In component
           const signInDiv = document.getElementById('clerk-sign-in');
