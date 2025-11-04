@@ -13,9 +13,8 @@ const demoAgent = {
   summary: 'Runs acquisition & lifecycle experiments for subscription and marketplace brands. Former Looply growth lead; now fractional.',
   location: 'Austin, TX (CT)',
   availability: 'Mon–Thu • 11a–4p CT',
-  lifetimeEarned: 6480,
+  linkedinUrl: 'https://www.linkedin.com/in/mayachen',
   rulesSummary: 'Anonymous first • $75/30m floor • Prefers async briefs before live calls',
-  latestShareValue: 284,
   focusAreas: [
     'Acquisition & lifecycle experiments for subscription apps',
     'Paid social creative testing + reporting automation',
@@ -297,8 +296,14 @@ function calculateEarningsEstimate(){
   return monthly;
 }
 
-function updateOnboardingPreview(){
+function updateOnboardingPreview(currentStep){
   if(!qs('.wizard')) return;
+
+  // Get current step from visible step if not provided
+  if(typeof currentStep === 'undefined'){
+    const visibleStep = qs('.wizard .step[style*="display: block"], .wizard .step:not([style*="display: none"])');
+    currentStep = visibleStep ? Number(visibleStep.dataset.step || 1) : 1;
+  }
 
   // Update profile preview
   const years = qs('#years')?.value;
@@ -337,19 +342,33 @@ function updateOnboardingPreview(){
   setText('#previewHours', `${hoursVal} hrs / week`);
   setText('#previewWindow', windowVal);
 
-  // Update categories
+  // Update categories - hide until user reaches step 4
   const enabled = qsa('.wizard .switch.on').map(sw=> sw.dataset.label).filter(Boolean);
   const categoriesEl = qs('#previewCategories');
   if(categoriesEl){
-    categoriesEl.innerHTML = enabled.length
-      ? enabled.map(c => `<div class="chip">${c}</div>`).join('')
-      : '<div class="small muted">Select categories in step 4</div>';
+    if(currentStep < 4){
+      categoriesEl.innerHTML = '';
+    } else {
+      categoriesEl.innerHTML = enabled.length
+        ? enabled.map(c => `<div class="chip">${c}</div>`).join('')
+        : '<div class="small muted">Select categories in step 4</div>';
+    }
   }
 
-  // Update earnings estimate
+  // Update earnings estimate - hide until step 6 (all steps complete)
   const estimate = calculateEarningsEstimate();
   const estNode = qs('#previewEstimate');
   const estNodeInStep = qs('#earningsEstimate');
+  const estCard = estNode?.closest('.preview-card-highlight');
+
+  // Show/hide estimate card based on current step
+  if(estCard){
+    if(currentStep < 6){
+      estCard.style.display = 'none';
+    } else {
+      estCard.style.display = 'block';
+    }
+  }
 
   const animateValue = (node) => {
     if(!node) return;
@@ -366,7 +385,10 @@ function updateOnboardingPreview(){
     node.dataset.val = String(estimate);
   };
 
-  animateValue(estNode);
+  // Only animate if on step 6 or later
+  if(currentStep >= 6){
+    animateValue(estNode);
+  }
   animateValue(estNodeInStep);
 }
 
@@ -499,6 +521,69 @@ function linkedinInit(){
   }
 }
 
+function skillsTagsInit(){
+  const skillsInput = qs('#skillsInput');
+  const skillsHidden = qs('#skills');
+  const skillsChips = qs('#skillsChips');
+  if(!skillsInput || !skillsHidden || !skillsChips) return;
+
+  let skills = [];
+
+  function updateSkills(){
+    skillsHidden.value = skills.join(', ');
+    renderChips();
+    updateOnboardingPreview();
+  }
+
+  function renderChips(){
+    skillsChips.innerHTML = skills.length === 0
+      ? '<div class="small muted" style="color: #94a3b8; padding: 4px 0;">No skills added yet</div>'
+      : skills.map((skill, idx) => `
+          <div class="chip" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: #f1f5f9; border-radius: 16px; font-size: 14px;">
+            <span>${skill}</span>
+            <button type="button" onclick="removeSkill(${idx})" style="background: none; border: none; cursor: pointer; padding: 0; margin: 0; color: #64748b; font-size: 16px; line-height: 1; font-weight: bold;" aria-label="Remove ${skill}">×</button>
+          </div>
+        `).join('');
+  }
+
+  // Make removeSkill globally accessible for onclick handler
+  window.removeSkill = function(idx){
+    skills.splice(idx, 1);
+    updateSkills();
+  };
+
+  function addSkill(skillText){
+    const trimmed = skillText.trim().toLowerCase();
+    if(trimmed && !skills.includes(trimmed)){
+      skills.push(trimmed);
+      updateSkills();
+    }
+    skillsInput.value = '';
+  }
+
+  // Handle Enter and comma keys
+  skillsInput.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' || e.key === ','){
+      e.preventDefault();
+      const value = skillsInput.value.trim();
+      if(value){
+        addSkill(value);
+      }
+    }
+  });
+
+  // Handle blur
+  skillsInput.addEventListener('blur', ()=>{
+    const value = skillsInput.value.trim();
+    if(value){
+      setTimeout(()=> addSkill(value), 150); // Small delay to allow datalist selection
+    }
+  });
+
+  // Initialize with empty state
+  updateSkills();
+}
+
 function wizardInit(){
   const steps = qsa('.wizard .step'); if(steps.length===0) return;
   let idx=0;
@@ -539,7 +624,8 @@ function wizardInit(){
     steps.forEach((s,k)=>s.style.display = (k===idx?'block':'none'));
     const ind=qs('.step-indicator'); if(ind) ind.textContent = `Step ${idx+1} of ${steps.length}`;
     const bar=qs('.progress .bar'); if(bar){ const pct = steps.length>1 ? (idx)/(steps.length-1) : 1; bar.style.width = `${pct*100}%`; }
-    updateOnboardingPreview();
+    // Pass current step (1-indexed) to preview update
+    updateOnboardingPreview(idx + 1);
     window.scrollTo({top: 0, behavior: 'smooth'});
   }
 
@@ -558,7 +644,6 @@ function wizardInit(){
   // Bind input listeners for real-time updates
   qs('#years')?.addEventListener('change', updateOnboardingPreview);
   qs('#location')?.addEventListener('input', updateOnboardingPreview);
-  qs('#skills')?.addEventListener('input', updateOnboardingPreview);
   qs('#linkedin')?.addEventListener('input', updateOnboardingPreview);
   qs('#twitter')?.addEventListener('input', updateOnboardingPreview);
   qs('#instagram')?.addEventListener('input', updateOnboardingPreview);
@@ -567,6 +652,7 @@ function wizardInit(){
   qs('#microfloor')?.addEventListener('input', updateOnboardingPreview);
   qs('#autoWindow')?.addEventListener('change', updateOnboardingPreview);
 
+  skillsTagsInit();
   bindSwitches();
   show(0);
 }
@@ -900,9 +986,11 @@ function handlePageInit(){
   setText('#handleSummary', demoAgent.summary);
   setText('#handleLocation', demoAgent.location);
   setText('#rulesSummary', demoAgent.rulesSummary);
-  setText('#lifetimeEarned', formatUsd(demoAgent.lifetimeEarned));
-  setText('#overnightEarned', formatUsd(demoAgent.latestShareValue));
   setText('#availability', demoAgent.availability);
+  const linkedinLink = qs('#linkedinLink');
+  if(linkedinLink && demoAgent.linkedinUrl){
+    linkedinLink.href = demoAgent.linkedinUrl;
+  }
   const avatar = qs('#handleAvatar'); if(avatar) avatar.textContent = demoAgent.avatar;
   const proofHolder = qs('#proofList'); if(proofHolder) proofHolder.innerHTML = demoAgent.socialProof.map(p=>`<div class="chip">${p}</div>`).join('');
   const focusList = qs('#focusList'); if(focusList) focusList.innerHTML = demoAgent.focusAreas.map(item=>`<li>${item}</li>`).join('');
