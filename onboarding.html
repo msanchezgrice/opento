@@ -55,8 +55,10 @@
             </label>
             <label class="input" style="grid-column: 1 / -1;">
               <span>Your skills</span>
-              <input id="skills" type="text" list="skillsList" placeholder="e.g., performance marketing, paid social, lifecycle" required>
-              <div class="small muted">Comma-separated. We'll match opportunities based on these.</div>
+              <input id="skillsInput" type="text" list="skillsList" placeholder="Start typing to add skills..." autocomplete="off">
+              <input id="skills" type="hidden" required>
+              <div id="skillsChips" class="skills-chips" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; min-height: 32px;"></div>
+              <div class="small muted">Type and press Enter or comma to add skills. Click X to remove.</div>
             </label>
           </div>
           <datalist id="locList">
