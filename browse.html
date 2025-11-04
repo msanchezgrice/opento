@@ -14,8 +14,8 @@
     <div class="brand"><img class="brand-logo" src="assets/logo.svg" alt="Opento"><div class="brand-name">Opento</div></div>
     <div class="actions">
       <a class="btn gray" href="index.html">Home</a>
+      <a class="btn gray" href="sign-in.html">Sign in</a>
       <a class="btn" href="testimonials.html">Testimonials</a>
-      <a class="btn primary" href="sign-up.html">Start my agent</a>
     </div>
   </div>
 
@@ -82,13 +82,8 @@
         document.getElementById('agentsGrid').style.display = 'none';
         document.getElementById('emptyState').style.display = 'none';
 
-        // In demo mode, show demo data
-        if (window.supabaseClient.demoMode) {
-          allAgents = generateDemoAgents();
-        } else {
-          // Load from Supabase
-          allAgents = await window.supabaseClient.browseAgents();
-        }
+        // Load from Supabase (will fallback to demo if needed)
+        allAgents = await window.supabaseClient.browseAgents();
 
         renderAgents(allAgents);
       } catch (error) {
@@ -212,7 +207,9 @@
       renderAgents(allAgents);
     }
 
-    function generateDemoAgents() {
+    // Demo agents moved to supabase-client.js - getDemoBrowseAgents()
+
+    function generateDemoAgents_DEPRECATED() {
       // Generate demo agents for showcase
       return [
         {
