@@ -75,6 +75,17 @@
   <script src="script.js"></script>
   <script>
     let allAgents = [];
+    
+    // Utility function to format USD
+    function formatUsd(amount) {
+      if (amount >= 1000000) {
+        return '$' + (amount / 1000000).toFixed(1) + 'M';
+      } else if (amount >= 1000) {
+        return '$' + (amount / 1000).toFixed(0) + 'K';
+      } else {
+        return '$' + amount.toFixed(0);
+      }
+    }
 
     async function loadAgents() {
       try {
@@ -103,7 +114,7 @@
     }
 
     function renderAgents(agents) {
-      console.log('🎨 renderAgents called with:', agents.length, 'agents');
+      console.log('🎨 renderAgents called with:', agents ? agents.length : 'null', 'agents');
       document.getElementById('loading').style.display = 'none';
       
       if (!agents || agents.length === 0) {
