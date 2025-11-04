@@ -61,19 +61,30 @@
       
       // Verify key is valid before proceeding
       if (!publishableKey || publishableKey.length < 10) {
-        throw new Error(`Invalid publishable key: "${publishableKey}". Expected key starting with pk_live_ or pk_test_`);
+        console.error('❌ Invalid publishable key:', publishableKey);
+        document.getElementById('clerk-sign-up').innerHTML = `
+          <div class="card">
+            <p class="small" style="color: #991b1b;">Invalid Clerk configuration. Key is missing or invalid.</p>
+            <a href="onboarding.html" class="btn gray">Continue in demo mode</a>
+          </div>
+        `;
+        return;
       }
       
       console.log('🔑 Initializing Clerk with key:', publishableKey.substring(0, 20) + '...');
       console.log('🔍 Full key length:', publishableKey.length);
 
-      // Load Clerk script first, then initialize manually (more reliable than data attribute)
+      // IMPORTANT: Set data-clerk-publishable-key BEFORE loading script
+      // This allows Clerk to auto-initialize with the correct key
       const script = document.createElement('script');
+      script.setAttribute('data-clerk-publishable-key', publishableKey);
       script.src = 'https://accounts.clerk.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
       script.async = true;
       script.onload = async () => {
         try {
-          // Wait for Clerk to be available
+          console.log('📦 Clerk script loaded, waiting for Clerk object...');
+          
+          // Wait for Clerk to be available (should auto-initialize with data attribute)
           let attempts = 0;
           while (!window.Clerk && attempts < 100) {
             await new Promise(resolve => setTimeout(resolve, 50));
@@ -81,18 +92,17 @@
           }
           
           if (!window.Clerk) {
-            throw new Error('Clerk object not found after script load');
+            throw new Error('Clerk object not found after script load. The script may have failed to initialize. Check that www.opento.co is added to Clerk Dashboard → Domains.');
           }
 
-          // Manually initialize Clerk with the key (don't rely on data attribute)
-          console.log('✅ Clerk script loaded, initializing with key...');
-          await window.Clerk.load({
-            publishableKey: publishableKey
-          });
+          console.log('✅ Clerk object available, waiting for it to be ready...');
+          
+          // Wait for Clerk to be ready (it should auto-initialize)
+          await window.Clerk.loaded;
 
-        // Mount Clerk Sign Up component
-        const signUpDiv = document.getElementById('clerk-sign-up');
-          clerk.mountSignUp(signUpDiv, {
+          // Mount Clerk Sign Up component
+          const signUpDiv = document.getElementById('clerk-sign-up');
+          window.Clerk.mountSignUp(signUpDiv, {
             afterSignUpUrl: '/onboarding',
           appearance: {
             elements: {
@@ -105,8 +115,8 @@
           }
         });
 
-        // Listen for successful sign up
-        clerk.addListener(({ session }) => {
+          // Listen for successful sign up
+          window.Clerk.addListener(({ session }) => {
           if (session) {
             // Create user in Supabase
             createUserInSupabase(session.user);
