@@ -61,20 +61,33 @@ However, if you want users to stay on your domain entirely, you can change Compo
 
 ---
 
-### Step 2: Configure Application URLs
+### Step 2: Configure Application Domains (CRITICAL - Fixes "Error loading authentication")
 
-Go to: **Domains** section
+Go to: **Clerk Dashboard** → Your Opento App → **Domains**
 
-Add your production domain(s):
-```
-https://opento-psi.vercel.app
-```
+**⚠️ THIS IS THE FIX FOR YOUR ERROR:** You must add all domains that will serve your app.
 
-If you have a custom domain:
-```
-https://opento.co
-https://www.opento.co
-```
+#### Add these domains:
+1. **Primary Vercel domain:**
+   ```
+   opento-psi.vercel.app
+   ```
+   (No `https://` needed - just the domain)
+
+2. **Custom domain (if using):**
+   ```
+   opento.co
+   ```
+
+3. **WWW subdomain (REQUIRED if using www.opento.co):**
+   ```
+   www.opento.co
+   ```
+
+**Important Notes:**
+- If users access your site via `www.opento.co`, you MUST add `www.opento.co` as a separate domain
+- Clerk needs to know about every domain that will make requests to Clerk
+- This is separate from DNS configuration (that's for Clerk's own subdomains like `accounts.opento.co`)
 
 ---
 
@@ -234,6 +247,15 @@ Subscribe to events:
 - Check browser console for errors
 - Ensure paths match exactly (case-sensitive)
 
+### Issue: "Error loading authentication" on sign-in/sign-up pages
+- **Most common cause:** Domain not added to Clerk → Domains
+- **Fix:** Add your domain(s) to Clerk Dashboard → Domains:
+  - `opento-psi.vercel.app`
+  - `opento.co` (if using custom domain)
+  - `www.opento.co` (if users access via www - this is often the issue!)
+- **Verify:** Check browser console for CORS errors
+- **Check:** Ensure publishable key in `config.js` matches Clerk dashboard
+
 ### Issue: "Invalid API key"
 - Verify `CLERK_SECRET_KEY` is set in Vercel
 - Check that publishable key in `config.js` matches Clerk dashboard
@@ -242,6 +264,7 @@ Subscribe to events:
 ### Issue: CORS errors
 - Add production domain to Clerk dashboard → Domains
 - Verify callback URLs include wildcard pattern: `https://opento-psi.vercel.app/*`
+- Make sure you've added BOTH `opento.co` AND `www.opento.co` if using www
 
 ---
 
