@@ -25,8 +25,7 @@
           <p class="lead" id="handleSummary">Runs acquisition & lifecycle experiments for subscription and marketplace brands. Ex-Looply growth lead; now fractional.</p>
           <div class="handle-meta-row"><span id="handleRole">Performance marketing lead for consumer apps</span> · <span id="handleLocation">Austin, TX (CT)</span></div>
           <div class="handle-actions">
-            <button id="requestIntro" class="btn primary">Request intro</button>
-            <a id="handleShareLink" class="btn ghost" href="share.html">See working receipt</a>
+            <button id="chatWithRep" class="btn primary">Chat with Rep</button>
           </div>
         </div>
       </div>
@@ -146,6 +145,30 @@ Budget/SLA: $8k creative sprint over 4 weeks. Decision-maker: Jenna (VP Growth).
             <p class="small">Rep replies within 1 business day. Identity reveals only after accept + escrow.</p>
             <p class="small muted">Need a prompt? Copy the template above and tweak it.</p>
           </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal" id="chatModal">
+    <div class="dialog chat-dialog">
+      <header>
+        <div>
+          <strong>Chat with <span id="displayNameChat">Maya</span>'s Rep</strong>
+          <p class="small">Ask about availability, rates, expertise, or anything else</p>
+        </div>
+        <button class="btn small gray" data-close="chat">Close</button>
+      </header>
+      <main class="chat-main">
+        <div class="chat-messages" id="chatMessages">
+          <!-- Messages will be added here dynamically -->
+        </div>
+        <div class="chat-input-wrapper">
+          <input type="text" id="chatInput" class="chat-input" placeholder="Type your question...">
+          <button id="chatSend" class="btn primary">Send</button>
+        </div>
+        <div class="chat-suggestions" id="chatSuggestions">
+          <!-- Quick reply buttons will appear here -->
         </div>
       </main>
     </div>

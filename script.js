@@ -751,6 +751,183 @@ function handlePageInit(){
       close();
     });
   }
+
+  // Chat functionality
+  const chatModal = qs('#chatModal');
+  const chatBtn = qs('#chatWithRep');
+  const chatMessages = qs('#chatMessages');
+  const chatInput = qs('#chatInput');
+  const chatSend = qs('#chatSend');
+  const chatSuggestions = qs('#chatSuggestions');
+
+  if(chatModal && chatBtn){
+    setText('#displayNameChat', demoAgent.displayName);
+    const chatState = { history: [], awaitingInput: false };
+
+    const openChat = ()=> {
+      chatModal.style.display='flex';
+      track('Chat Opened');
+      if(chatState.history.length === 0){
+        setTimeout(()=> addBotMessage(`Hi! I'm ${demoAgent.displayName}'s Rep. I can help answer questions about their availability, rates, expertise, and how to work together. What would you like to know?`, true), 300);
+      }
+      chatInput.focus();
+    };
+    const closeChat = ()=> { chatModal.style.display='none'; };
+
+    chatBtn.addEventListener('click', openChat);
+    chatModal.addEventListener('click', (e)=>{ if(e.target===chatModal) closeChat(); });
+    qsa('[data-close="chat"]', chatModal).forEach(btn=> btn.addEventListener('click', closeChat));
+
+    const addMessage = (text, isBot, showSuggestions = false)=> {
+      const msg = document.createElement('div');
+      msg.className = `chat-message ${isBot ? 'bot' : 'user'}`;
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+      avatar.textContent = isBot ? demoAgent.avatar : 'Y';
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.innerHTML = text;
+      msg.appendChild(avatar);
+      msg.appendChild(bubble);
+      chatMessages.appendChild(msg);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      chatState.history.push({ text, isBot });
+
+      if(showSuggestions && isBot){
+        showQuickReplies();
+      }
+    };
+
+    const addBotMessage = (text, showSuggestions = false)=> {
+      const typing = document.createElement('div');
+      typing.className = 'chat-typing';
+      typing.innerHTML = '<span></span><span></span><span></span>';
+      chatMessages.appendChild(typing);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      setTimeout(()=> {
+        typing.remove();
+        addMessage(text, true, showSuggestions);
+      }, 800 + Math.random() * 400);
+    };
+
+    const showQuickReplies = ()=> {
+      chatSuggestions.innerHTML = '';
+      const suggestions = [
+        'What are the rates?',
+        'What is Maya available for?',
+        'Tell me about expertise',
+        'When is Maya available?',
+        'How do I request an intro?'
+      ];
+      suggestions.forEach(text => {
+        const btn = document.createElement('button');
+        btn.className = 'chat-suggestion-btn';
+        btn.textContent = text;
+        btn.addEventListener('click', ()=> {
+          chatSuggestions.innerHTML = '';
+          sendMessage(text);
+        });
+        chatSuggestions.appendChild(btn);
+      });
+    };
+
+    const generateResponse = (input)=> {
+      const lower = input.toLowerCase();
+
+      // Rates and pricing
+      if(lower.match(/rate|price|cost|floor|pay|charge|fee|budget/)){
+        return `${demoAgent.displayName}'s rates are:<br><br>
+        • <strong>$${demoAgent.onboarding.floor}/30 minutes</strong> for consulting calls<br>
+        • <strong>$${demoAgent.onboarding.microFloor}/5 minutes</strong> for async tasks<br>
+        • Available for <strong>${demoAgent.onboarding.hours} hours/week</strong><br><br>
+        ${demoAgent.rulesSummary}`;
+      }
+
+      // Availability and schedule
+      if(lower.match(/availab|when|schedule|time|hours|window|calendar/)){
+        return `${demoAgent.displayName} is available:<br><br>
+        <strong>${demoAgent.availability}</strong><br><br>
+        They can commit up to <strong>${demoAgent.onboarding.hours} hours per week</strong> for the right projects.`;
+      }
+
+      // What they're open to / services
+      if(lower.match(/open to|available for|do|offer|service|work|help with|taking on/)){
+        return `${demoAgent.displayName} is currently taking on:<br><br>
+        <ul>${demoAgent.openTo.map(item => `<li>${item}</li>`).join('')}</ul>
+        Focus areas include: ${demoAgent.focusAreas.join('; ')}`;
+      }
+
+      // Expertise and background
+      if(lower.match(/expert|experience|background|skill|qualified|credential|proof|wins|results/)){
+        const winsHtml = demoAgent.recentWins.map(w => `<li>${w}</li>`).join('');
+        const proofHtml = demoAgent.socialProof.join(' • ');
+        return `${demoAgent.displayName} brings deep expertise:<br><br>
+        <strong>Recent wins:</strong>
+        <ul>${winsHtml}</ul>
+        <strong>Credentials:</strong> ${proofHtml}`;
+      }
+
+      // How to work together / intro process
+      if(lower.match(/intro|request|hire|work together|get started|next step|contact|reach/)){
+        return `${demoAgent.requestIntro.pitch}<br><br>
+        <strong>To request an intro:</strong><br>
+        <ul>${demoAgent.requestIntro.guidelines.map(g => `<li>${g}</li>`).join('')}</ul>
+        ${demoAgent.requestIntro.note}<br><br>
+        Ready to send an intro request? Just let me know!`;
+      }
+
+      // Location
+      if(lower.match(/location|where|timezone|based/)){
+        return `${demoAgent.displayName} is based in <strong>${demoAgent.location}</strong>.`;
+      }
+
+      // General questions or greeting
+      if(lower.match(/hi|hello|hey|thanks|thank you/)){
+        return `Happy to help! Feel free to ask about ${demoAgent.displayName}'s availability, rates, expertise, or how to get started working together.`;
+      }
+
+      // Yes to intro request
+      if(lower.match(/yes|yeah|sure|okay|ok|ready|let'?s do it|send/)){
+        setTimeout(()=> {
+          chatModal.style.display = 'none';
+          if(modal){
+            modal.style.display = 'flex';
+            track('Chat to Intro Conversion');
+            qs('#introName')?.focus();
+          }
+        }, 1000);
+        return `Great! Opening the intro request form for you now...`;
+      }
+
+      // Default fallback
+      return `I can help you with:<br><br>
+      • What ${demoAgent.displayName} is available for<br>
+      • Rates and pricing<br>
+      • Availability and schedule<br>
+      • Expertise and recent wins<br>
+      • How to request an intro<br><br>
+      What would you like to know?`;
+    };
+
+    const sendMessage = (text)=> {
+      if(!text || text.trim() === '') return;
+      addMessage(text, false);
+      chatInput.value = '';
+      track('Chat Message Sent', { length: text.length });
+
+      const response = generateResponse(text);
+      addBotMessage(response, false);
+    };
+
+    chatSend.addEventListener('click', ()=> sendMessage(chatInput.value));
+    chatInput.addEventListener('keypress', (e)=> {
+      if(e.key === 'Enter'){
+        e.preventDefault();
+        sendMessage(chatInput.value);
+      }
+    });
+  }
 }
 
 function sharePageInit(){
