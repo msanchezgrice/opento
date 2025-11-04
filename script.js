@@ -715,7 +715,6 @@ function handlePageInit(){
   setText('#introNote', demoAgent.requestIntro.note);
   setText('#introTemplatePreview', demoAgent.requestIntro.template);
   const shareLink = qs('#handleShareLink'); if(shareLink) shareLink.href = `share.html?handle=${handle}`;
-  qs('#previewInboxLink')?.setAttribute('href', 'inbox.html?tab=micro&demo=1');
 
   const modal = qs('#introModal');
   const openBtn = qs('#requestIntro');
