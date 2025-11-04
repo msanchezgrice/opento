@@ -342,6 +342,90 @@ function bindSwitches(){
   });
 }
 
+function linkedinInit(){
+  const signInBtn = qs('#linkedinSignIn');
+  const skipBtn = qs('#linkedinSkip');
+  const statusDiv = qs('#linkedinStatus');
+  const userNameEl = qs('#linkedinUserName');
+
+  // Check if already connected
+  const linkedinData = JSON.parse(localStorage.getItem('opento_linkedin') || 'null');
+  if(linkedinData && linkedinData.connected){
+    // Show connected state
+    if(statusDiv) statusDiv.style.display = 'block';
+    if(userNameEl) userNameEl.textContent = linkedinData.name || 'Connected';
+    if(signInBtn) signInBtn.style.display = 'none';
+    if(skipBtn) skipBtn.textContent = 'Continue';
+  }
+
+  if(signInBtn){
+    signInBtn.addEventListener('click', ()=>{
+      track('LinkedIn Sign In Clicked', {});
+      // Mock OAuth flow - in production this would redirect to LinkedIn OAuth
+      // For now, simulate a successful auth
+      toast('Connecting to LinkedIn...');
+
+      // Simulate API delay
+      setTimeout(()=>{
+        // Mock user data - in production this would come from LinkedIn API
+        const mockLinkedinData = {
+          connected: true,
+          name: 'Demo User',
+          profileUrl: 'https://linkedin.com/in/demo',
+          headline: 'Marketing Professional',
+          // These would be extracted from actual LinkedIn profile
+          experience: [],
+          education: [],
+          skills: []
+        };
+
+        localStorage.setItem('opento_linkedin', JSON.stringify(mockLinkedinData));
+
+        // Update UI
+        if(statusDiv) statusDiv.style.display = 'block';
+        if(userNameEl) userNameEl.textContent = mockLinkedinData.name;
+        if(signInBtn) signInBtn.style.display = 'none';
+        if(skipBtn) skipBtn.textContent = 'Continue';
+
+        toast('✓ LinkedIn connected successfully');
+        track('LinkedIn Connected', {method: 'oauth'});
+      }, 1000);
+    });
+  }
+
+  if(skipBtn){
+    skipBtn.addEventListener('click', ()=>{
+      const linkedinData = JSON.parse(localStorage.getItem('opento_linkedin') || 'null');
+      const isConnected = linkedinData && linkedinData.connected;
+
+      track('LinkedIn Step Action', {action: isConnected ? 'continue' : 'skip'});
+
+      // Move to next step
+      const steps = qsa('.wizard .step');
+      const currentStep = Array.from(steps).findIndex(s => s.style.display !== 'none');
+      if(currentStep !== -1){
+        const nextBtn = steps[currentStep].querySelector('[data-next]');
+        if(nextBtn){
+          nextBtn.click();
+        } else {
+          // Manual navigation
+          steps[currentStep].style.display = 'none';
+          if(steps[currentStep + 1]){
+            steps[currentStep + 1].style.display = 'block';
+            const ind = qs('.step-indicator');
+            if(ind) ind.textContent = `Step ${currentStep + 2} of ${steps.length}`;
+            const bar = qs('.progress .bar');
+            if(bar){
+              const pct = steps.length > 1 ? (currentStep + 1) / (steps.length - 1) : 1;
+              bar.style.width = `${pct * 100}%`;
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
 function wizardInit(){
   const steps = qsa('.wizard .step'); if(steps.length===0) return;
   let idx=0;
@@ -1025,7 +1109,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   sharePageInit();
 
   // onboarding
-  if(qs('.wizard')) wizardInit();
+  if(qs('.wizard')){ wizardInit(); linkedinInit(); }
   if(qs('#quickStart')) quickStartInit();
 
   // inbox
