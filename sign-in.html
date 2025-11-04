@@ -30,7 +30,7 @@
 
   <!-- Clerk SDK -->
   <script>
-    // Wait for config.js to load, then load Clerk
+    // Wait for config.js to load, then initialize Clerk
     function initClerk() {
       // Debug: Check if config loaded
       console.log('🔍 Checking config...', {
@@ -40,7 +40,9 @@
         keyValue: window.opentoConfig?.clerk?.publishableKey || 'MISSING'
       });
 
-      if (!window.opentoConfig?.clerk?.publishableKey) {
+      const publishableKey = window.opentoConfig?.clerk?.publishableKey;
+      
+      if (!publishableKey) {
         console.error('❌ Clerk publishable key not found in config');
         document.getElementById('clerk-sign-in').innerHTML = `
           <div class="card">
@@ -57,38 +59,33 @@
         return;
       }
 
-      // Load Clerk from CDN
+      console.log('🔑 Initializing Clerk with key:', publishableKey.substring(0, 20) + '...');
+
+      // Use Clerk's recommended script tag method with data-publishable-key
       const script = document.createElement('script');
+      script.setAttribute('data-publishable-key', publishableKey);
       script.src = 'https://accounts.clerk.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
       script.async = true;
+      
       script.onload = async () => {
         try {
-          // Wait a bit for Clerk to attach to window
+          // Wait for Clerk to be available (it should auto-initialize with the data attribute)
           let attempts = 0;
-          while (!window.Clerk && attempts < 50) {
-            await new Promise(resolve => setTimeout(resolve, 100));
+          while (!window.Clerk && attempts < 100) {
+            await new Promise(resolve => setTimeout(resolve, 50));
             attempts++;
           }
           
-          const clerk = window.Clerk;
-          if (!clerk) {
-            throw new Error('Clerk object not found after script load. Make sure accounts.clerk.dev is accessible.');
+          if (!window.Clerk) {
+            throw new Error('Clerk object not found after script load. Check network tab for errors loading clerk.browser.js');
           }
-          
-          const publishableKey = window.opentoConfig?.clerk?.publishableKey;
-          if (!publishableKey) {
-            throw new Error('Publishable key not found in config. Check config.js');
-          }
-          
-          console.log('🔑 Loading Clerk with key:', publishableKey.substring(0, 20) + '...');
-          
-          await clerk.load({
-            publishableKey: publishableKey
-          });
+
+          // Wait for Clerk to finish loading
+          await window.Clerk.load();
 
           // Mount Clerk Sign In component
           const signInDiv = document.getElementById('clerk-sign-in');
-          clerk.mountSignIn(signInDiv, {
+          window.Clerk.mountSignIn(signInDiv, {
             afterSignInUrl: '/inbox',
             appearance: {
               elements: {
@@ -103,24 +100,34 @@
           console.log('✅ Clerk sign-in component mounted successfully');
         } catch (error) {
           console.error('❌ Clerk initialization error:', error);
+          console.error('Error details:', {
+            message: error.message,
+            stack: error.stack,
+            clerkAvailable: !!window.Clerk,
+            configAvailable: !!window.opentoConfig
+          });
           document.getElementById('clerk-sign-in').innerHTML = `
             <div class="card">
               <p class="small" style="color: #991b1b;">Error loading authentication. Please check your configuration.</p>
               <p class="small" style="color: #991b1b; margin-top: 8px;">Error: ${error.message || 'Unknown error'}</p>
+              <p class="small" style="color: #666; margin-top: 8px;">Check browser console for details.</p>
               <a href="inbox.html" class="btn gray">Continue in demo mode</a>
             </div>
           `;
         }
       };
-      script.onerror = () => {
-        console.error('❌ Failed to load Clerk script from CDN');
+      
+      script.onerror = (error) => {
+        console.error('❌ Failed to load Clerk script from CDN', error);
         document.getElementById('clerk-sign-in').innerHTML = `
           <div class="card">
-            <p class="small" style="color: #991b1b;">Failed to load Clerk authentication library. Please check your internet connection.</p>
+            <p class="small" style="color: #991b1b;">Failed to load Clerk authentication library.</p>
+            <p class="small" style="color: #666; margin-top: 8px;">Check if accounts.clerk.dev is accessible.</p>
             <a href="inbox.html" class="btn gray">Continue in demo mode</a>
           </div>
         `;
       };
+      
       document.head.appendChild(script);
     }
 
@@ -135,9 +142,15 @@
           setTimeout(waitForConfig, 50);
         } else {
           console.error('❌ Config.js failed to load after 5 seconds');
+          console.error('Config check:', {
+            opentoConfig: window.opentoConfig,
+            clerk: window.opentoConfig?.clerk,
+            key: window.opentoConfig?.clerk?.publishableKey
+          });
           document.getElementById('clerk-sign-in').innerHTML = `
             <div class="card">
               <p class="small" style="color: #991b1b;">Configuration file failed to load. Please refresh the page.</p>
+              <p class="small" style="color: #666; margin-top: 8px;">Make sure config.js is accessible at: <code>${window.location.origin}/config.js</code></p>
               <a href="/" class="btn gray">Go home</a>
             </div>
           `;

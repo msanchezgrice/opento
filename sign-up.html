@@ -57,22 +57,29 @@
         return;
       }
 
-      // Load Clerk from CDN
+      const publishableKey = window.opentoConfig.clerk.publishableKey;
+      console.log('🔑 Initializing Clerk with key:', publishableKey.substring(0, 20) + '...');
+
+      // Use Clerk's recommended script tag method with data-publishable-key
       const script = document.createElement('script');
+      script.setAttribute('data-publishable-key', publishableKey);
       script.src = 'https://accounts.clerk.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
       script.async = true;
       script.onload = async () => {
         try {
-          const clerk = window.Clerk;
-          if (!clerk) {
-            throw new Error('Clerk object not found after script load');
+          // Wait for Clerk to be available (it should auto-initialize with the data attribute)
+          let attempts = 0;
+          while (!window.Clerk && attempts < 100) {
+            await new Promise(resolve => setTimeout(resolve, 50));
+            attempts++;
           }
           
-          console.log('🔑 Loading Clerk with key:', window.opentoConfig.clerk.publishableKey.substring(0, 20) + '...');
-          
-          await clerk.load({
-            publishableKey: window.opentoConfig.clerk.publishableKey
-          });
+          if (!window.Clerk) {
+            throw new Error('Clerk object not found after script load');
+          }
+
+          // Wait for Clerk to finish loading
+          await window.Clerk.load();
 
         // Mount Clerk Sign Up component
         const signUpDiv = document.getElementById('clerk-sign-up');
