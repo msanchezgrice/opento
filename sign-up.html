@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Sign Up — Opento</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
+</head>
+<body>
+  <div class="nav">
+    <div class="brand"><img class="brand-logo" src="assets/logo.svg" alt="Opento"><div class="brand-name">Opento</div></div>
+    <div class="actions">
+      <a class="btn gray" href="sign-in.html">Sign in</a>
+      <a class="btn primary" href="index.html">Home</a>
+    </div>
+  </div>
+
+  <div class="container section" style="max-width: 480px; margin: 60px auto;">
+    <h2 style="text-align: center;">Create your Opento account</h2>
+    <p class="lead" style="text-align: center;">Start earning with your agent in minutes</p>
+    
+    <!-- Clerk Sign Up Component will mount here -->
+    <div id="clerk-sign-up"></div>
+
+    <div style="text-align: center; margin-top: 20px;">
+      <p class="small">Already have an account? <a href="sign-in.html">Sign in</a></p>
+    </div>
+  </div>
+
+  <!-- Clerk SDK -->
+  <script>
+    // Load Clerk from CDN
+    const script = document.createElement('script');
+    script.src = 'https://accounts.clerk.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
+    script.async = true;
+    script.onload = initClerk;
+    document.head.appendChild(script);
+
+    async function initClerk() {
+      if (!window.opentoConfig?.clerk?.publishableKey) {
+        document.getElementById('clerk-sign-up').innerHTML = `
+          <div class="card">
+            <h3>Configuration Required</h3>
+            <p class="small">Please configure Clerk in <code>config.js</code></p>
+            <ol class="small">
+              <li>Create a Clerk account at <a href="https://clerk.dev" target="_blank">clerk.dev</a></li>
+              <li>Copy your publishable key</li>
+              <li>Update <code>config.js</code> with your key</li>
+            </ol>
+            <a href="onboarding.html" class="btn">Continue in demo mode</a>
+          </div>
+        `;
+        return;
+      }
+
+      try {
+        const clerk = window.Clerk;
+        await clerk.load({
+          publishableKey: window.opentoConfig.clerk.publishableKey
+        });
+
+        // Mount Clerk Sign Up component
+        const signUpDiv = document.getElementById('clerk-sign-up');
+        clerk.mountSignUp(signUpDiv, {
+          afterSignUpUrl: '/onboarding.html',
+          appearance: {
+            elements: {
+              rootBox: { margin: '0 auto' },
+              card: { 
+                boxShadow: 'none',
+                border: '1px solid #E2E8F0'
+              }
+            }
+          }
+        });
+
+        // Listen for successful sign up
+        clerk.addListener(({ session }) => {
+          if (session) {
+            // Create user in Supabase
+            createUserInSupabase(session.user);
+          }
+        });
+      } catch (error) {
+        console.error('Clerk initialization error:', error);
+        document.getElementById('clerk-sign-up').innerHTML = `
+          <div class="card">
+            <p class="small" style="color: #991b1b;">Error loading authentication. Please check your configuration.</p>
+            <a href="onboarding.html" class="btn gray">Continue in demo mode</a>
+          </div>
+        `;
+      }
+    }
+
+    async function createUserInSupabase(clerkUser) {
+      try {
+        const userData = {
+          clerk_id: clerkUser.id,
+          email: clerkUser.primaryEmailAddress?.emailAddress,
+          display_name: `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim(),
+          avatar_initials: getInitials(clerkUser.firstName, clerkUser.lastName)
+        };
+
+        // This would be handled by a Clerk webhook in production
+        console.log('User created:', userData);
+        
+        // Redirect to onboarding
+        window.location.href = '/onboarding.html';
+      } catch (error) {
+        console.error('Error creating user:', error);
+      }
+    }
+
+    function getInitials(firstName, lastName) {
+      const first = (firstName || '').charAt(0).toUpperCase();
+      const last = (lastName || '').charAt(0).toUpperCase();
+      return first + last || 'U';
+    }
+  </script>
+</body>
+</html>

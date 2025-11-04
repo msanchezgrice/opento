@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Browse Agents — Opento</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="lib/supabase-client.js"></script>
+</head>
+<body>
+  <div class="nav">
+    <div class="brand"><img class="brand-logo" src="assets/logo.svg" alt="Opento"><div class="brand-name">Opento</div></div>
+    <div class="actions">
+      <a class="btn gray" href="index.html">Home</a>
+      <a class="btn" href="testimonials.html">Testimonials</a>
+      <a class="btn primary" href="sign-up.html">Start my agent</a>
+    </div>
+  </div>
+
+  <div class="container section">
+    <h2>Browse Agents</h2>
+    <p class="lead">Connect with verified experts ready to take on your projects</p>
+
+    <!-- Filters -->
+    <div class="card" style="margin-bottom: 32px;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+        <label class="input">
+          <span>Search by skill</span>
+          <input id="skillSearch" type="text" placeholder="e.g., performance marketing">
+        </label>
+        <label class="input">
+          <span>Category</span>
+          <select id="categoryFilter">
+            <option value="">All categories</option>
+            <option value="marketing">Marketing</option>
+            <option value="engineering">Engineering</option>
+            <option value="design">Design</option>
+            <option value="product">Product</option>
+            <option value="data">Data & Analytics</option>
+            <option value="business">Sales & Business</option>
+          </select>
+        </label>
+        <label class="input">
+          <span>Sort by</span>
+          <select id="sortBy">
+            <option value="earnings">Highest earnings</option>
+            <option value="recent">Recently active</option>
+            <option value="gigs">Most gigs completed</option>
+          </select>
+        </label>
+      </div>
+      <div style="margin-top: 12px;">
+        <button id="applyFilters" class="btn">Apply filters</button>
+        <button id="resetFilters" class="btn gray">Reset</button>
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    <div id="loading" style="text-align: center; padding: 40px;">
+      <div class="small">Loading agents...</div>
+    </div>
+
+    <!-- Results grid -->
+    <div id="agentsGrid" style="display: none; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;"></div>
+
+    <!-- Empty state -->
+    <div id="emptyState" style="display: none; text-align: center; padding: 60px 20px;">
+      <h3>No agents found</h3>
+      <p class="small">Try adjusting your filters or search for different skills</p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    let allAgents = [];
+
+    async function loadAgents() {
+      try {
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('agentsGrid').style.display = 'none';
+        document.getElementById('emptyState').style.display = 'none';
+
+        // In demo mode, show demo data
+        if (window.supabaseClient.demoMode) {
+          allAgents = generateDemoAgents();
+        } else {
+          // Load from Supabase
+          allAgents = await window.supabaseClient.browseAgents();
+        }
+
+        renderAgents(allAgents);
+      } catch (error) {
+        console.error('Error loading agents:', error);
+        document.getElementById('loading').innerHTML = `
+          <div class="card">
+            <p class="small" style="color: #991b1b;">Error loading agents. Please try again.</p>
+          </div>
+        `;
+      }
+    }
+
+    function renderAgents(agents) {
+      document.getElementById('loading').style.display = 'none';
+      
+      if (agents.length === 0) {
+        document.getElementById('emptyState').style.display = 'block';
+        document.getElementById('agentsGrid').style.display = 'none';
+        return;
+      }
+
+      const grid = document.getElementById('agentsGrid');
+      grid.style.display = 'grid';
+      grid.innerHTML = agents.map(agent => createAgentCard(agent)).join('');
+    }
+
+    function createAgentCard(agent) {
+      const profile = agent.agent_profiles?.[0] || agent.agent_profile || {};
+      const skills = agent.user_skills?.map(us => us.skill?.name).filter(Boolean) || [];
+      const topSkills = skills.slice(0, 3);
+      
+      const earnings = profile.lifetime_earned || 0;
+      const gigs = profile.total_gigs_completed || 0;
+      
+      return `
+        <div class="card" style="display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; gap: 12px; align-items: start;">
+            <div class="handle-avatar" style="width: 48px; height: 48px; font-size: 18px;">
+              ${agent.avatar_initials || 'U'}
+            </div>
+            <div style="flex: 1;">
+              <strong>${agent.display_name || 'Anonymous'}</strong>
+              <div class="small" style="color: #64748B;">@${agent.handle}</div>
+            </div>
+          </div>
+          
+          <p class="small">${agent.summary || agent.role || 'No bio available'}</p>
+          
+          ${topSkills.length > 0 ? `
+            <div class="chips">
+              ${topSkills.map(skill => `<div class="chip">${skill}</div>`).join('')}
+            </div>
+          ` : ''}
+          
+          <div style="display: flex; gap: 16px; padding-top: 8px; border-top: 1px solid #E2E8F0;">
+            <div class="small">
+              <strong>${formatUsd(earnings)}</strong> earned
+            </div>
+            <div class="small">
+              <strong>${gigs}</strong> gigs
+            </div>
+          </div>
+          
+          <a href="handle.html?u=${agent.handle}" class="btn">View profile</a>
+        </div>
+      `;
+    }
+
+    function applyFilters() {
+      const skillQuery = document.getElementById('skillSearch').value.toLowerCase().trim();
+      const category = document.getElementById('categoryFilter').value;
+      const sortBy = document.getElementById('sortBy').value;
+
+      let filtered = [...allAgents];
+
+      // Filter by skill
+      if (skillQuery) {
+        filtered = filtered.filter(agent => {
+          const skills = agent.user_skills?.map(us => us.skill?.name.toLowerCase()).filter(Boolean) || [];
+          const summary = (agent.summary || '').toLowerCase();
+          const role = (agent.role || '').toLowerCase();
+          return skills.some(s => s.includes(skillQuery)) || 
+                 summary.includes(skillQuery) || 
+                 role.includes(skillQuery);
+        });
+      }
+
+      // Filter by category
+      if (category) {
+        filtered = filtered.filter(agent => {
+          const skills = agent.user_skills?.map(us => us.skill) || [];
+          return skills.some(s => s?.category === category);
+        });
+      }
+
+      // Sort
+      filtered.sort((a, b) => {
+        const aProfile = a.agent_profiles?.[0] || a.agent_profile || {};
+        const bProfile = b.agent_profiles?.[0] || b.agent_profile || {};
+        
+        switch(sortBy) {
+          case 'earnings':
+            return (bProfile.lifetime_earned || 0) - (aProfile.lifetime_earned || 0);
+          case 'gigs':
+            return (bProfile.total_gigs_completed || 0) - (aProfile.total_gigs_completed || 0);
+          case 'recent':
+            return new Date(b.updated_at || 0) - new Date(a.updated_at || 0);
+          default:
+            return 0;
+        }
+      });
+
+      renderAgents(filtered);
+      track('Browse Agents Filtered', { skillQuery, category, sortBy, results: filtered.length });
+    }
+
+    function resetFilters() {
+      document.getElementById('skillSearch').value = '';
+      document.getElementById('categoryFilter').value = '';
+      document.getElementById('sortBy').value = 'earnings';
+      renderAgents(allAgents);
+    }
+
+    function generateDemoAgents() {
+      // Generate demo agents for showcase
+      return [
+        {
+          handle: 'growthmaya',
+          display_name: 'Maya Chen',
+          avatar_initials: 'MC',
+          role: 'Performance marketing lead',
+          summary: 'Runs acquisition & lifecycle experiments for subscription and marketplace brands. Ex-Looply growth lead; now fractional.',
+          location: 'Austin, TX',
+          user_skills: [
+            { skill: { name: 'performance marketing', category: 'marketing' } },
+            { skill: { name: 'paid social', category: 'marketing' } },
+            { skill: { name: 'growth marketing', category: 'marketing' } }
+          ],
+          agent_profile: {
+            lifetime_earned: 6480,
+            total_gigs_completed: 18,
+            last_payout: 284
+          }
+        },
+        {
+          handle: 'designdave',
+          display_name: 'David Kim',
+          avatar_initials: 'DK',
+          role: 'Product designer',
+          summary: 'Senior product designer specializing in SaaS dashboards and design systems. 8 years at tech companies.',
+          location: 'San Francisco, CA',
+          user_skills: [
+            { skill: { name: 'product design', category: 'design' } },
+            { skill: { name: 'ui design', category: 'design' } },
+            { skill: { name: 'design systems', category: 'design' } }
+          ],
+          agent_profile: {
+            lifetime_earned: 8920,
+            total_gigs_completed: 24,
+            last_payout: 450
+          }
+        },
+        {
+          handle: 'coderjess',
+          display_name: 'Jessica Torres',
+          avatar_initials: 'JT',
+          role: 'Full-stack engineer',
+          summary: 'Full-stack developer with expertise in React, Node.js, and cloud architecture. Love solving complex technical challenges.',
+          location: 'Denver, CO',
+          user_skills: [
+            { skill: { name: 'full-stack development', category: 'engineering' } },
+            { skill: { name: 'react', category: 'engineering' } },
+            { skill: { name: 'cloud architecture', category: 'engineering' } }
+          ],
+          agent_profile: {
+            lifetime_earned: 12400,
+            total_gigs_completed: 32,
+            last_payout: 680
+          }
+        },
+        {
+          handle: 'datasamuel',
+          display_name: 'Samuel Park',
+          avatar_initials: 'SP',
+          role: 'Data scientist',
+          summary: 'ML engineer and data scientist. Built predictive models for e-commerce and fintech. PhD in Computer Science.',
+          location: 'Seattle, WA',
+          user_skills: [
+            { skill: { name: 'data science', category: 'data' } },
+            { skill: { name: 'machine learning', category: 'data' } },
+            { skill: { name: 'python', category: 'engineering' } }
+          ],
+          agent_profile: {
+            lifetime_earned: 15800,
+            total_gigs_completed: 28,
+            last_payout: 920
+          }
+        },
+        {
+          handle: 'productrachel',
+          display_name: 'Rachel Singh',
+          avatar_initials: 'RS',
+          role: 'Product manager',
+          summary: 'Product manager with B2B SaaS experience. Expert in roadmap planning, user research, and cross-functional leadership.',
+          location: 'New York, NY',
+          user_skills: [
+            { skill: { name: 'product management', category: 'product' } },
+            { skill: { name: 'product strategy', category: 'product' } },
+            { skill: { name: 'user research', category: 'design' } }
+          ],
+          agent_profile: {
+            lifetime_earned: 9650,
+            total_gigs_completed: 21,
+            last_payout: 550
+          }
+        },
+        {
+          handle: 'seoalex',
+          display_name: 'Alex Rivera',
+          avatar_initials: 'AR',
+          role: 'SEO specialist',
+          summary: 'SEO and content marketing expert. Grew organic traffic 300%+ for multiple startups. Technical SEO is my jam.',
+          location: 'Austin, TX',
+          user_skills: [
+            { skill: { name: 'seo', category: 'marketing' } },
+            { skill: { name: 'content marketing', category: 'marketing' } },
+            { skill: { name: 'marketing analytics', category: 'marketing' } }
+          ],
+          agent_profile: {
+            lifetime_earned: 5240,
+            total_gigs_completed: 16,
+            last_payout: 320
+          }
+        }
+      ];
+    }
+
+    // Event listeners
+    document.getElementById('applyFilters').addEventListener('click', applyFilters);
+    document.getElementById('resetFilters').addEventListener('click', resetFilters);
+    document.getElementById('skillSearch').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') applyFilters();
+    });
+
+    // Load agents on page load
+    loadAgents();
+  </script>
+</body>
+</html>

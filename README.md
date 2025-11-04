@@ -18,12 +18,16 @@ python3 -m http.server 8080
 | `landing-autopilot.html` | Landing variant: background growth rep |
 | `landing-compound.html` | Landing variant: compounding agent |
 | `landing-radar.html` | Landing variant: opportunity radar |
-| `testimonial-performance-marketer.html` | Jordan Ellis case study |
-| `testimonial-retired-teacher.html` | Linda Ramos case study |
-| `testimonial-senior-product-manager.html` | Andre Wallace case study |
-| plus `onboarding.html`, `inbox.html`, `recipes.html`, `share.html`, … | |
+| **`sign-up.html`** | **NEW: Clerk sign up page** |
+| **`sign-in.html`** | **NEW: Clerk sign in page** |
+| **`browse.html`** | **NEW: Browse all agents (search/filter)** |
+| `onboarding.html` | **Now saves to Supabase!** |
+| `handle.html` | **Now loads from Supabase!** |
+| `inbox.html` | **Now shows real matched offers!** |
+| `testimonial-*.html` | Case studies |
+| plus `recipes.html`, `share.html`, `email.html`, … | |
 
-Everything shares `styles.css` and `script.js`, so new pages inherit the existing animations, persona data, and components.
+Everything shares `styles.css` and `script.js`, plus new backend integrations in `lib/` folder.
 
 ## Deploying with Vercel
 
