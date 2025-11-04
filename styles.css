@@ -53,6 +53,7 @@ small, .small { color: var(--muted); }
 /* Mobile nav */
 .menu-toggle { display:none; background:transparent; border:1px solid #ffffff35; color:#fff; padding:8px 10px; border-radius:8px; font-weight:700; }
 .actions { display:flex; align-items:center; gap:8px; }
+.handle-page .nav .actions { display: none; }
 
 .hero { display:grid; grid-template-columns: 1.2fr 0.8fr; gap: 28px; padding: 40px 24px 22px; }
 .hero h1 { font-size: 48px; line-height: 1.06; margin:0 0 12px; }
