@@ -67,29 +67,39 @@
       console.log('🔑 Initializing Clerk with key:', publishableKey.substring(0, 20) + '...');
       console.log('🔍 Full key length:', publishableKey.length);
 
-      // Load Clerk script first, then initialize manually (more reliable than data attribute)
+      // Load Clerk script with crossorigin to avoid CORS issues
       const script = document.createElement('script');
-      script.src = 'https://accounts.clerk.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
+      script.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@5/dist/clerk.browser.js';
+      script.crossOrigin = 'anonymous';
       script.async = true;
       
       script.onload = async () => {
+        console.log('📦 Clerk script loaded from CDN');
+        
         try {
-          // Wait for Clerk to be available
+          // Wait for Clerk to be available on window
           let attempts = 0;
+          console.log('⏳ Waiting for window.Clerk...');
           while (!window.Clerk && attempts < 100) {
             await new Promise(resolve => setTimeout(resolve, 50));
             attempts++;
           }
           
+          console.log(`✓ After ${attempts} attempts, window.Clerk exists:`, !!window.Clerk);
+          
           if (!window.Clerk) {
-            throw new Error('Clerk object not found after script load. Check network tab for errors loading clerk.browser.js');
+            throw new Error('Clerk object not found after script load. Check network tab for clerk.browser.js');
           }
 
-          // Manually initialize Clerk with the key (don't rely on data attribute)
-          console.log('✅ Clerk script loaded, initializing with key...');
+          // Initialize Clerk with the key
+          console.log('✅ Clerk object found, initializing with publishable key...');
+          console.log('🔑 Key to use:', publishableKey);
+          
           await window.Clerk.load({
             publishableKey: publishableKey
           });
+          
+          console.log('✅ Clerk.load() completed successfully');
 
           // Mount Clerk Sign In component
           const signInDiv = document.getElementById('clerk-sign-in');
