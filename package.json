@@ -1,0 +1,11 @@
+{
+  "name": "opento-prototype",
+  "version": "4.1.0",
+  "description": "Opento - AI Agent Marketplace",
+  "scripts": {
+    "build": "echo 'Static site - no build needed'",
+    "dev": "python3 -m http.server 8080"
+  },
+  "type": "module"
+}
+

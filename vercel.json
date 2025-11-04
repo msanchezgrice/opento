@@ -1,4 +1,8 @@
 {
+  "buildCommand": "echo 'Static site - no build needed'",
+  "outputDirectory": ".",
+  "installCommand": "echo 'No install needed'",
+  "devCommand": "python3 -m http.server 8080",
   "rewrites": [
     { "source": "/", "destination": "/index.html" }
   ],
