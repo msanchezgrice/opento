@@ -60,15 +60,29 @@ https://*.opento.co/*
 
 **Note**: Your code already sets these in `sign-in.html` and `sign-up.html` using `afterSignInUrl` and `afterSignUpUrl`, but Clerk dashboard settings provide fallback/default behavior.
 
-### Step 1b: Component Paths (Optional - You're Using Account Portal)
+### Step 1b: Component Paths (Use Application Domain)
 
-The Component paths section shows:
-- Sign-in: `https://accounts.opento.co/sign-in`
-- Sign-up: `https://accounts.opento.co/sign-up`
+Go to: **Clerk Dashboard** → Your Opento App → **Paths** → **Component paths**
 
-**This is fine** - Clerk's Account Portal is used when users navigate directly to Clerk URLs. Since you're embedding Clerk components in your own pages (`/sign-in.html`, `/sign-up.html`), this setting doesn't affect your main flow.
+Select "application domain" for all three options and enter:
 
-However, if you want users to stay on your domain entirely, you can change Component paths to use "application domain" instead of "Account Portal".
+**<SignIn /> - Sign-in page on application domain:**
+```
+https://www.opento.co/sign-in
+```
+
+**<SignUp /> - Sign-up page on application domain:**
+```
+https://www.opento.co/sign-up
+```
+
+**Signing Out - Path on application domain:**
+```
+https://www.opento.co/
+```
+(Or `https://www.opento.co/sign-in` if you prefer)
+
+**Note:** Since `vercel.json` has `cleanUrls: true`, URLs work without `.html` extension. Use `/sign-in` not `/sign-in.html`.
 
 ---
 
