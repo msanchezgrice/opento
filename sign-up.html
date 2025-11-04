@@ -5,7 +5,7 @@
   <title>Sign Up — Opento</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="styles.css">
-  <script src="config.js"></script>
+  <script src="config.js" defer></script>
 </head>
 <body>
   <div class="nav">
@@ -30,15 +30,18 @@
 
   <!-- Clerk SDK -->
   <script>
-    // Load Clerk from CDN
-    const script = document.createElement('script');
-    script.src = 'https://accounts.clerk.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
-    script.async = true;
-    script.onload = initClerk;
-    document.head.appendChild(script);
+    // Wait for config.js to load, then load Clerk
+    function initClerk() {
+      // Debug: Check if config loaded
+      console.log('🔍 Checking config...', {
+        hasConfig: !!window.opentoConfig,
+        hasClerk: !!window.opentoConfig?.clerk,
+        hasKey: !!window.opentoConfig?.clerk?.publishableKey,
+        keyValue: window.opentoConfig?.clerk?.publishableKey || 'MISSING'
+      });
 
-    async function initClerk() {
       if (!window.opentoConfig?.clerk?.publishableKey) {
+        console.error('❌ Clerk publishable key not found in config');
         document.getElementById('clerk-sign-up').innerHTML = `
           <div class="card">
             <h3>Configuration Required</h3>
@@ -54,11 +57,22 @@
         return;
       }
 
-      try {
-        const clerk = window.Clerk;
-        await clerk.load({
-          publishableKey: window.opentoConfig.clerk.publishableKey
-        });
+      // Load Clerk from CDN
+      const script = document.createElement('script');
+      script.src = 'https://accounts.clerk.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
+      script.async = true;
+      script.onload = async () => {
+        try {
+          const clerk = window.Clerk;
+          if (!clerk) {
+            throw new Error('Clerk object not found after script load');
+          }
+          
+          console.log('🔑 Loading Clerk with key:', window.opentoConfig.clerk.publishableKey.substring(0, 20) + '...');
+          
+          await clerk.load({
+            publishableKey: window.opentoConfig.clerk.publishableKey
+          });
 
         // Mount Clerk Sign Up component
         const signUpDiv = document.getElementById('clerk-sign-up');
