@@ -5,7 +5,7 @@
   <title>Sign In — Opento</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="styles.css">
-  <script src="config.js" defer></script>
+  <script src="config.js"></script>
 </head>
 <body>
   <div class="nav">
@@ -113,14 +113,19 @@
     }
 
     // Wait for config.js to load before initializing Clerk
+    function waitForConfig() {
+      if (window.opentoConfig && window.opentoConfig.clerk && window.opentoConfig.clerk.publishableKey) {
+        initClerk();
+      } else {
+        // Check again after a short delay
+        setTimeout(waitForConfig, 50);
+      }
+    }
+
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => {
-        // Give config.js a moment to load
-        setTimeout(initClerk, 100);
-      });
+      document.addEventListener('DOMContentLoaded', waitForConfig);
     } else {
-      // DOM already loaded, wait a bit for config.js
-      setTimeout(initClerk, 100);
+      waitForConfig();
     }
   </script>
 </body>
