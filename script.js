@@ -1002,6 +1002,14 @@ function handlePageInit(){
   setText('#introTemplatePreview', demoAgent.requestIntro.template);
   const shareLink = qs('#handleShareLink'); if(shareLink) shareLink.href = `share.html?handle=${handle}`;
 
+  // Initialize cycling "open to" text
+  const firstName = demoAgent.displayName.split(' ')[0];
+  setText('#handleNameInline', firstName);
+  const typewriterHandle = qs('.typewriter-handle');
+  if(typewriterHandle) {
+    typeWriter(typewriterHandle, demoAgent.openTo, 55, 1300);
+  }
+
   const modal = qs('#introModal');
   const openBtn = qs('#requestIntro');
   const templateBtn = qs('#copyIntroTemplate');
