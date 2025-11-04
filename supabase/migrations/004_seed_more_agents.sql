@@ -24,106 +24,126 @@ INSERT INTO users (clerk_id, handle, display_name, email, avatar_initials, locat
 ('demo_user_025', 'growthliam', 'Liam Harris', 'liam@example.com', 'LH', 'Remote', 'Growth Hacker', 'Growth marketing and viral loops expert. Scaled 3 companies from 0 to 100K users.'),
 ('demo_user_026', 'qaava', 'Ava Martinez', 'ava@example.com', 'AM', 'Chicago, IL', 'QA Engineer', 'Quality assurance and test automation specialist. Selenium, Cypress, and manual testing.');
 
--- Add skills for each agent (mapping to existing skills from 002_seed_skills.sql)
--- Sarah Martinez - UX Designer (skills: 42, 43, 52)
-INSERT INTO user_skills (user_id, skill_id, years_experience) 
-SELECT id, unnest(ARRAY[42, 43, 52]), unnest(ARRAY[10, 10, 8])
-FROM users WHERE handle = 'sarahdesign';
-
--- Carlos Rodriguez - Backend Engineer (skills: 24, 38, 28)
+-- Add skills for each agent (lookup by name to ensure correct IDs)
+-- Sarah Martinez - UX Designer
 INSERT INTO user_skills (user_id, skill_id, years_experience)
-SELECT id, unnest(ARRAY[24, 38, 28]), unnest(ARRAY[8, 8, 6])
-FROM users WHERE handle = 'techcarlos';
+SELECT u.id, s.id, 10
+FROM users u, skills s
+WHERE u.handle = 'sarahdesign' AND s.name IN ('ux design', 'product design', 'design systems');
 
--- Kimberly Lee - Content Strategist (skills: 9, 5, 11)
+-- Carlos Rodriguez - Backend Engineer
 INSERT INTO user_skills (user_id, skill_id, years_experience)
-SELECT id, unnest(ARRAY[9, 5, 11]), unnest(ARRAY[7, 7, 5])
-FROM users WHERE handle = 'contentkim';
+SELECT u.id, s.id, 8
+FROM users u, skills s
+WHERE u.handle = 'techcarlos' AND s.name IN ('backend development', 'python', 'database design');
 
--- Andrew Thompson - Full-Stack Developer (skills: 22, 36, 37)
+-- Kimberly Lee - Content Strategist
 INSERT INTO user_skills (user_id, skill_id, years_experience)
-SELECT id, unnest(ARRAY[22, 36, 37]), unnest(ARRAY[6, 6, 5])
-FROM users WHERE handle = 'devandrew';
+SELECT u.id, s.id, 7
+FROM users u, skills s
+WHERE u.handle = 'contentkim' AND s.name IN ('content marketing', 'seo', 'copywriting');
 
--- Lisa Wong - Data Analyst (skills: 64, 69, 68)
+-- Andrew Thompson - Full-Stack Developer
 INSERT INTO user_skills (user_id, skill_id, years_experience)
-SELECT id, unnest(ARRAY[64, 69, 68]), unnest(ARRAY[8, 8, 7])
-FROM users WHERE handle = 'analyticslisa';
+SELECT u.id, s.id, 6
+FROM users u, skills s
+WHERE u.handle = 'devandrew' AND s.name IN ('full-stack development', 'react', 'node.js');
 
--- John Davis - Brand Designer (skills: 47, 46, 45)
+-- Lisa Wong - Data Analyst
 INSERT INTO user_skills (user_id, skill_id, years_experience)
-SELECT id, unnest(ARRAY[47, 46, 45]), unnest(ARRAY[9, 9, 8])
-FROM users WHERE handle = 'brandjohn';
+SELECT u.id, s.id, 8
+FROM users u, skills s
+WHERE u.handle = 'analyticslisa' AND s.name IN ('data analytics', 'sql', 'data visualization');
 
--- Michael Chen - Email Marketing (skills: 6, 7, 13)
+-- John Davis - Brand Designer
 INSERT INTO user_skills (user_id, skill_id, years_experience)
-SELECT id, unnest(ARRAY[6, 7, 13]), unnest(ARRAY[7, 7, 6])
-FROM users WHERE handle = 'marketingmike';
+SELECT u.id, s.id, 9
+FROM users u, skills s
+WHERE u.handle = 'brandjohn' AND s.name IN ('branding', 'graphic design', 'visual design');
 
--- Emily Brown - UX Researcher (skills: 52, 43, 51)
+-- Michael Chen - Email Marketing
 INSERT INTO user_skills (user_id, skill_id, years_experience)
-SELECT id, unnest(ARRAY[52, 43, 51]), unnest(ARRAY[9, 8, 7])
-FROM users WHERE handle = 'uxemily';
+SELECT u.id, s.id, 7
+FROM users u, skills s
+WHERE u.handle = 'marketingmike' AND s.name IN ('email marketing', 'lifecycle marketing', 'marketing automation');
 
--- Thomas Anderson - Frontend Engineer (skills: 23, 36, 35)
+-- Emily Brown - UX Researcher
 INSERT INTO user_skills (user_id, skill_id, years_experience)
-SELECT id, unnest(ARRAY[23, 36, 35]), unnest(ARRAY[7, 7, 6])
-FROM users WHERE handle = 'frontendtom';
+SELECT u.id, s.id, 9
+FROM users u, skills s
+WHERE u.handle = 'uxemily' AND s.name IN ('user research', 'ux design', 'prototyping');
 
--- Anna Johnson - Product Manager (skills: 57, 58, 60)
+-- Thomas Anderson - Frontend Engineer
 INSERT INTO user_skills (user_id, skill_id, years_experience)
-SELECT id, unnest(ARRAY[57, 58, 60]), unnest(ARRAY[9, 9, 8])
-FROM users WHERE handle = 'productanna';
+SELECT u.id, s.id, 7
+FROM users u, skills s
+WHERE u.handle = 'frontendtom' AND s.name IN ('frontend development', 'react', 'typescript');
 
--- Nina Patel - ML Engineer (skills: 67, 66, 38)
+-- Anna Johnson - Product Manager
 INSERT INTO user_skills (user_id, skill_id, years_experience)
-SELECT id, unnest(ARRAY[67, 66, 38]), unnest(ARRAY[6, 6, 8])
-FROM users WHERE handle = 'mlnina';
+SELECT u.id, s.id, 9
+FROM users u, skills s
+WHERE u.handle = 'productanna' AND s.name IN ('product management', 'product strategy', 'product analytics');
 
--- Jack Wilson - Mobile Developer (skills: 25, 23, 36)
+-- Nina Patel - ML Engineer
 INSERT INTO user_skills (user_id, skill_id, years_experience)
-SELECT id, unnest(ARRAY[25, 23, 36]), unnest(ARRAY[8, 6, 6])
-FROM users WHERE handle = 'mobilejack';
+SELECT u.id, s.id, 6
+FROM users u, skills s
+WHERE u.handle = 'mlnina' AND s.name IN ('machine learning', 'data science', 'python');
 
--- Emma Taylor - Technical SEO (skills: 5, 31, 11)
+-- Jack Wilson - Mobile Developer
 INSERT INTO user_skills (user_id, skill_id, years_experience)
-SELECT id, unnest(ARRAY[5, 31, 11]), unnest(ARRAY[7, 5, 6])
-FROM users WHERE handle = 'seoemma';
+SELECT u.id, s.id, 8
+FROM users u, skills s
+WHERE u.handle = 'mobilejack' AND s.name IN ('mobile development', 'frontend development', 'react');
 
--- Olivia White - Sales Operations (skills: 75, 81, 82)
+-- Emma Taylor - Technical SEO
 INSERT INTO user_skills (user_id, skill_id, years_experience)
-SELECT id, unnest(ARRAY[75, 81, 82]), unnest(ARRAY[8, 7, 6])
-FROM users WHERE handle = 'salesolivia';
+SELECT u.id, s.id, 7
+FROM users u, skills s
+WHERE u.handle = 'seoemma' AND s.name IN ('seo', 'web performance', 'marketing analytics');
 
--- Ryan Moore - Creative Director (skills: 46, 47, 9)
+-- Olivia White - Sales Operations
 INSERT INTO user_skills (user_id, skill_id, years_experience)
-SELECT id, unnest(ARRAY[46, 47, 9]), unnest(ARRAY[12, 12, 10])
-FROM users WHERE handle = 'creativeryan';
+SELECT u.id, s.id, 8
+FROM users u, skills s
+WHERE u.handle = 'salesolivia' AND s.name IN ('sales', 'operations', 'project management');
 
--- Samantha Garcia - DevOps Engineer (skills: 26, 29, 32)
+-- Ryan Moore - Creative Director
 INSERT INTO user_skills (user_id, skill_id, years_experience)
-SELECT id, unnest(ARRAY[26, 29, 32]), unnest(ARRAY[7, 7, 5])
-FROM users WHERE handle = 'devopssam';
+SELECT u.id, s.id, 12
+FROM users u, skills s
+WHERE u.handle = 'creativeryan' AND s.name IN ('graphic design', 'branding', 'content marketing');
 
--- Sophie Martin - Data Scientist (skills: 63, 70, 64)
+-- Samantha Garcia - DevOps Engineer
 INSERT INTO user_skills (user_id, skill_id, years_experience)
-SELECT id, unnest(ARRAY[63, 70, 64]), unnest(ARRAY[6, 6, 7])
-FROM users WHERE handle = 'datasophie';
+SELECT u.id, s.id, 7
+FROM users u, skills s
+WHERE u.handle = 'devopssam' AND s.name IN ('devops', 'cloud architecture', 'security');
 
--- Daniel Lopez - Product Designer (skills: 44, 42, 43)
+-- Sophie Martin - Data Scientist
 INSERT INTO user_skills (user_id, skill_id, years_experience)
-SELECT id, unnest(ARRAY[44, 42, 43]), unnest(ARRAY[8, 8, 7])
-FROM users WHERE handle = 'designdaniel';
+SELECT u.id, s.id, 6
+FROM users u, skills s
+WHERE u.handle = 'datasophie' AND s.name IN ('data science', 'statistical analysis', 'predictive modeling');
 
--- Liam Harris - Growth Hacker (skills: 8, 1, 12)
+-- Daniel Lopez - Product Designer
 INSERT INTO user_skills (user_id, skill_id, years_experience)
-SELECT id, unnest(ARRAY[8, 1, 12]), unnest(ARRAY[6, 6, 5])
-FROM users WHERE handle = 'growthliam';
+SELECT u.id, s.id, 8
+FROM users u, skills s
+WHERE u.handle = 'designdaniel' AND s.name IN ('product design', 'ui design', 'ux design');
 
--- Ava Martinez - QA Engineer (skills: 33, 23, 82)
+-- Liam Harris - Growth Hacker
 INSERT INTO user_skills (user_id, skill_id, years_experience)
-SELECT id, unnest(ARRAY[33, 23, 82]), unnest(ARRAY[7, 5, 6])
-FROM users WHERE handle = 'qaava';
+SELECT u.id, s.id, 6
+FROM users u, skills s
+WHERE u.handle = 'growthliam' AND s.name IN ('growth marketing', 'performance marketing', 'conversion optimization');
+
+-- Ava Martinez - QA Engineer
+INSERT INTO user_skills (user_id, skill_id, years_experience)
+SELECT u.id, s.id, 7
+FROM users u, skills s
+WHERE u.handle = 'qaava' AND s.name IN ('qa testing', 'frontend development', 'project management');
 
 -- Create agent profiles for all 20 agents
 INSERT INTO agent_profiles (user_id, open_to, focus_areas, recent_wins, social_proof, lifetime_earned, last_payout, total_gigs_completed)
