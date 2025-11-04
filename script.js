@@ -832,62 +832,10 @@ function handlePageInit(){
       });
     };
 
-    const generateResponse = (input)=> {
+    const generateResponse = async (input)=> {
       const lower = input.toLowerCase();
 
-      // Rates and pricing
-      if(lower.match(/rate|price|cost|floor|pay|charge|fee|budget/)){
-        return `${demoAgent.displayName}'s rates are:<br><br>
-        • <strong>$${demoAgent.onboarding.floor}/30 minutes</strong> for consulting calls<br>
-        • <strong>$${demoAgent.onboarding.microFloor}/5 minutes</strong> for async tasks<br>
-        • Available for <strong>${demoAgent.onboarding.hours} hours/week</strong><br><br>
-        ${demoAgent.rulesSummary}`;
-      }
-
-      // Availability and schedule
-      if(lower.match(/availab|when|schedule|time|hours|window|calendar/)){
-        return `${demoAgent.displayName} is available:<br><br>
-        <strong>${demoAgent.availability}</strong><br><br>
-        They can commit up to <strong>${demoAgent.onboarding.hours} hours per week</strong> for the right projects.`;
-      }
-
-      // What they're open to / services
-      if(lower.match(/open to|available for|do|offer|service|work|help with|taking on/)){
-        return `${demoAgent.displayName} is currently taking on:<br><br>
-        <ul>${demoAgent.openTo.map(item => `<li>${item}</li>`).join('')}</ul>
-        Focus areas include: ${demoAgent.focusAreas.join('; ')}`;
-      }
-
-      // Expertise and background
-      if(lower.match(/expert|experience|background|skill|qualified|credential|proof|wins|results/)){
-        const winsHtml = demoAgent.recentWins.map(w => `<li>${w}</li>`).join('');
-        const proofHtml = demoAgent.socialProof.join(' • ');
-        return `${demoAgent.displayName} brings deep expertise:<br><br>
-        <strong>Recent wins:</strong>
-        <ul>${winsHtml}</ul>
-        <strong>Credentials:</strong> ${proofHtml}`;
-      }
-
-      // How to work together / intro process
-      if(lower.match(/intro|request|hire|work together|get started|next step|contact|reach/)){
-        return `${demoAgent.requestIntro.pitch}<br><br>
-        <strong>To request an intro:</strong><br>
-        <ul>${demoAgent.requestIntro.guidelines.map(g => `<li>${g}</li>`).join('')}</ul>
-        ${demoAgent.requestIntro.note}<br><br>
-        Ready to send an intro request? Just let me know!`;
-      }
-
-      // Location
-      if(lower.match(/location|where|timezone|based/)){
-        return `${demoAgent.displayName} is based in <strong>${demoAgent.location}</strong>.`;
-      }
-
-      // General questions or greeting
-      if(lower.match(/hi|hello|hey|thanks|thank you/)){
-        return `Happy to help! Feel free to ask about ${demoAgent.displayName}'s availability, rates, expertise, or how to get started working together.`;
-      }
-
-      // Yes to intro request
+      // Check for "yes/ready" response to open intro form
       if(lower.match(/yes|yeah|sure|okay|ok|ready|let'?s do it|send/)){
         setTimeout(()=> {
           chatModal.style.display = 'none';
@@ -900,23 +848,53 @@ function handlePageInit(){
         return `Great! Opening the intro request form for you now...`;
       }
 
-      // Default fallback
-      return `I can help you with:<br><br>
-      • What ${demoAgent.displayName} is available for<br>
-      • Rates and pricing<br>
-      • Availability and schedule<br>
-      • Expertise and recent wins<br>
-      • How to request an intro<br><br>
-      What would you like to know?`;
+      // Call backend API for AI response
+      try {
+        // Build messages array for API (last 10 messages for context)
+        const messages = chatState.history
+          .slice(-10)
+          .map(msg => ({
+            role: msg.isBot === false ? 'user' : 'assistant',
+            content: msg.text || msg.content
+          }))
+          .concat([{ role: 'user', content: input }]);
+
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages,
+            agentData: demoAgent
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data.reply;
+
+      } catch (error) {
+        console.error('Chat API error:', error);
+        track('Chat API Error', { error: error.message });
+
+        // Fallback to basic response if API fails
+        return `I'm having trouble connecting right now. Please try again in a moment, or feel free to use the intro request form to send ${demoAgent.displayName} a message directly.`;
+      }
     };
 
-    const sendMessage = (text)=> {
+    const sendMessage = async (text)=> {
       if(!text || text.trim() === '') return;
+      if(chatState.awaitingResponse) return; // Prevent double-sends
+
       addMessage(text, false);
       chatInput.value = '';
+      chatState.awaitingResponse = true;
       track('Chat Message Sent', { length: text.length });
 
-      const response = generateResponse(text);
+      const response = await generateResponse(text);
+      chatState.awaitingResponse = false;
       addBotMessage(response, false);
     };
 
