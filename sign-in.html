@@ -63,15 +63,27 @@
       script.async = true;
       script.onload = async () => {
         try {
-          const clerk = window.Clerk;
-          if (!clerk) {
-            throw new Error('Clerk object not found after script load');
+          // Wait a bit for Clerk to attach to window
+          let attempts = 0;
+          while (!window.Clerk && attempts < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
           }
           
-          console.log('🔑 Loading Clerk with key:', window.opentoConfig.clerk.publishableKey.substring(0, 20) + '...');
+          const clerk = window.Clerk;
+          if (!clerk) {
+            throw new Error('Clerk object not found after script load. Make sure accounts.clerk.dev is accessible.');
+          }
+          
+          const publishableKey = window.opentoConfig?.clerk?.publishableKey;
+          if (!publishableKey) {
+            throw new Error('Publishable key not found in config. Check config.js');
+          }
+          
+          console.log('🔑 Loading Clerk with key:', publishableKey.substring(0, 20) + '...');
           
           await clerk.load({
-            publishableKey: window.opentoConfig.clerk.publishableKey
+            publishableKey: publishableKey
           });
 
           // Mount Clerk Sign In component
@@ -115,12 +127,24 @@
     // Wait for config.js to load before initializing Clerk
     function waitForConfig() {
       if (window.opentoConfig && window.opentoConfig.clerk && window.opentoConfig.clerk.publishableKey) {
+        console.log('✅ Config loaded, initializing Clerk...');
         initClerk();
       } else {
-        // Check again after a short delay
-        setTimeout(waitForConfig, 50);
+        // Check again after a short delay, but timeout after 5 seconds
+        if (Date.now() - waitForConfig.startTime < 5000) {
+          setTimeout(waitForConfig, 50);
+        } else {
+          console.error('❌ Config.js failed to load after 5 seconds');
+          document.getElementById('clerk-sign-in').innerHTML = `
+            <div class="card">
+              <p class="small" style="color: #991b1b;">Configuration file failed to load. Please refresh the page.</p>
+              <a href="/" class="btn gray">Go home</a>
+            </div>
+          `;
+        }
       }
     }
+    waitForConfig.startTime = Date.now();
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', waitForConfig);
