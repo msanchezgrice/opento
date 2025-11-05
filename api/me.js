@@ -31,6 +31,7 @@ export default async function handler(req, res) {
       displayName: user.display_name,
       email: user.email,
       avatarInitials: user.avatar_initials,
+      avatar_url: user.avatar_url,
       location: user.location,
       role: user.role,
       summary: user.summary,
