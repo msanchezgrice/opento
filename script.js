@@ -1055,14 +1055,19 @@ function handlePageInit(){
   const chatSuggestions = qs('#chatSuggestions');
 
   if(chatModal && chatBtn){
-    setText('#displayNameChat', demoAgent.displayName);
+    // Use current agent data if available, fallback to demo agent
+    const agent = window.currentAgentData || demoAgent;
+    const agentName = agent.display_name || agent.displayName || 'Agent';
+    const firstName = agentName.split(' ')[0];
+    
+    setText('#displayNameChat', firstName);
     const chatState = { history: [], awaitingInput: false };
 
     const openChat = ()=> {
       chatModal.style.display='flex';
       track('Chat Opened');
       if(chatState.history.length === 0){
-        setTimeout(()=> addBotMessage(`Hi! I'm ${demoAgent.displayName}'s Rep. I can help answer questions about their availability, rates, expertise, and how to work together. What would you like to know?`, true), 300);
+        setTimeout(()=> addBotMessage(`Hi! I'm ${firstName}'s Rep. I can help answer questions about their availability, rates, expertise, and how to work together. What would you like to know?`, true), 300);
       }
       chatInput.focus();
     };
@@ -1077,7 +1082,8 @@ function handlePageInit(){
       msg.className = `chat-message ${isBot ? 'bot' : 'user'}`;
       const avatar = document.createElement('div');
       avatar.className = 'avatar';
-      avatar.textContent = isBot ? demoAgent.avatar : 'Y';
+      const agentAvatar = agent.avatar_initials || agent.avatar || firstName.substring(0,2).toUpperCase();
+      avatar.textContent = isBot ? agentAvatar : 'Y';
       const bubble = document.createElement('div');
       bubble.className = 'bubble';
       bubble.innerHTML = text;
@@ -1109,9 +1115,9 @@ function handlePageInit(){
       chatSuggestions.innerHTML = '';
       const suggestions = [
         'What are the rates?',
-        'What is Maya available for?',
+        `What is ${firstName} available for?`,
         'Tell me about expertise',
-        'When is Maya available?',
+        `When is ${firstName} available?`,
         'How do I request an intro?'
       ];
       suggestions.forEach(text => {
@@ -1158,7 +1164,7 @@ function handlePageInit(){
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             messages,
-            agentData: demoAgent
+            agentData: agent
           })
         });
 
@@ -1174,7 +1180,7 @@ function handlePageInit(){
         track('Chat API Error', { error: error.message });
 
         // Fallback to basic response if API fails
-        return `I'm having trouble connecting right now. Please try again in a moment, or feel free to use the intro request form to send ${demoAgent.displayName} a message directly.`;
+        return `I'm having trouble connecting right now. Please try again in a moment, or feel free to use the intro request form to send ${firstName} a message directly.`;
       }
     };
 
