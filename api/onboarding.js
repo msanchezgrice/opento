@@ -23,8 +23,14 @@ export default async function handler(req, res) {
       settings,
       skills,
       socialLinks,
-      profileData
+      profileData = {}
     } = req.body;
+    
+    // Extract enhanced fields from profileData
+    const seniorityLevel = profileData.seniorityLevel;
+    const currentCompany = profileData.currentCompany;
+    const yearsInRole = profileData.yearsInRole;
+    const industries = profileData.industries || [];
 
     if (!userId) {
       return res.status(400).json({ error: 'User ID is required' });
@@ -137,6 +143,14 @@ export default async function handler(req, res) {
       .from('agent_profiles')
       .upsert({
         user_id: userId,
+        location: profileData.location,
+        years_experience: profileData.yearsExperience ? parseInt(profileData.yearsExperience) : null,
+        // Enhanced fields
+        seniority_level: seniorityLevel,
+        current_company: currentCompany,
+        years_in_role: yearsInRole,
+        industries: industries,
+        // Generated fields
         open_to: openTo,
         focus_areas: focusAreas,
         recent_wins: [],

@@ -116,7 +116,65 @@
               <div id="skillsChips" class="skills-chips" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; min-height: 32px;"></div>
               <div class="small muted">Start typing to search, click to add. Click X on chips to remove.</div>
             </label>
+            
+            <!-- Enhanced fields -->
+            <label class="input">
+              <span>Seniority level</span>
+              <select id="seniorityLevel" required>
+                <option value="">Select level...</option>
+                <option value="Junior">Junior (0-3 years)</option>
+                <option value="Mid">Mid-level (3-6 years)</option>
+                <option value="Senior" selected>Senior (6-10 years)</option>
+                <option value="Lead">Lead (10-15 years)</option>
+                <option value="Executive">Executive (15+ years)</option>
+              </select>
+              <div class="small muted">Helps match you with appropriate opportunities</div>
+            </label>
+            
+            <label class="input">
+              <span>Current company (optional)</span>
+              <input id="currentCompany" type="text" placeholder="e.g., Google, Stripe">
+              <div class="small muted">Adds credibility to your profile</div>
+            </label>
+            
+            <label class="input">
+              <span>Years in current role</span>
+              <select id="yearsInRole">
+                <option value="">Select...</option>
+                <option value="0">Less than 1 year</option>
+                <option value="1">1 year</option>
+                <option value="2" selected>2 years</option>
+                <option value="3">3 years</option>
+                <option value="4">4 years</option>
+                <option value="5">5 years</option>
+                <option value="6">6+ years</option>
+              </select>
+            </label>
+            
+            <label class="input" style="grid-column: 1 / -1;">
+              <span>Industries you've worked in</span>
+              <div id="industriesSelector" style="display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; border: 2px solid var(--border); border-radius: 12px; min-height: 80px; cursor: pointer; background: #fafafa;">
+                <div class="small muted" style="width: 100%; text-align: center; padding: 20px 0;" id="industriesPlaceholder">Click to select industries...</div>
+              </div>
+              <div class="small muted">Select all that apply (helps with matching)</div>
+            </label>
           </div>
+          
+          <!-- Industries modal -->
+          <div id="industriesModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+            <div style="background: white; border-radius: 16px; padding: 32px; max-width: 600px; max-height: 80vh; overflow-y: auto;">
+              <h3 style="margin: 0 0 16px;">Select Industries</h3>
+              <p class="small muted" style="margin-bottom: 20px;">Choose the industries you have experience in</p>
+              <div id="industriesList" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;">
+                <!-- Will be populated with checkboxes -->
+              </div>
+              <div style="display: flex; gap: 12px;">
+                <button type="button" class="btn primary" onclick="closeIndustriesModal()">Done</button>
+                <button type="button" class="btn gray" onclick="clearIndustries()">Clear All</button>
+              </div>
+            </div>
+          </div>
+          
           <datalist id="locList">
             <option>Austin, TX</option>
             <option>San Francisco, CA</option>
@@ -555,6 +613,99 @@
       
       renderOpportunities(genericOps);
     }
+    
+    // Industries selector
+    let selectedIndustries = [];
+    let industriesData = [];
+    
+    // Load industries from API
+    fetch('/api/industries')
+      .then(res => res.json())
+      .then(data => {
+        industriesData = data.industries || [];
+        renderIndustriesList();
+      })
+      .catch(err => {
+        console.error('Error loading industries:', err);
+        // Fallback industries
+        industriesData = [
+          { name: 'SaaS', popular: true },
+          { name: 'E-commerce', popular: true },
+          { name: 'Fintech', popular: true },
+          { name: 'Healthtech', popular: true },
+          { name: 'AI/ML', popular: true },
+          { name: 'Developer Tools', popular: true },
+          { name: 'Cloud Infrastructure', popular: true },
+          { name: 'Mobile Apps', popular: true },
+          { name: 'Web3/Crypto', popular: true },
+          { name: 'Marketplaces', popular: true }
+        ];
+        renderIndustriesList();
+      });
+    
+    function renderIndustriesList() {
+      const list = document.getElementById('industriesList');
+      if (!list) return;
+      
+      list.innerHTML = industriesData.map(industry => `
+        <label style="display: flex; align-items: center; gap: 8px; padding: 10px; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+          <input type="checkbox" value="${industry.name}" onchange="toggleIndustry('${industry.name}')" ${selectedIndustries.includes(industry.name) ? 'checked' : ''}>
+          <span>${industry.name}</span>
+          ${industry.popular ? '<span class="chip" style="font-size: 11px; padding: 2px 6px; margin-left: auto;">Popular</span>' : ''}
+        </label>
+      `).join('');
+    }
+    
+    function toggleIndustry(industry) {
+      if (selectedIndustries.includes(industry)) {
+        selectedIndustries = selectedIndustries.filter(i => i !== industry);
+      } else {
+        selectedIndustries.push(industry);
+      }
+      updateIndustriesDisplay();
+    }
+    
+    function updateIndustriesDisplay() {
+      const selector = document.getElementById('industriesSelector');
+      const placeholder = document.getElementById('industriesPlaceholder');
+      
+      if (selectedIndustries.length === 0) {
+        placeholder.style.display = 'block';
+        return;
+      }
+      
+      placeholder.style.display = 'none';
+      selector.innerHTML = selectedIndustries.map(industry => `
+        <div class="chip" style="display: flex; align-items: center; gap: 6px;">
+          ${industry}
+          <button type="button" onclick="removeIndustry('${industry}')" style="background: none; border: none; cursor: pointer; padding: 0; font-size: 16px;">&times;</button>
+        </div>
+      `).join('') + '<div class="small muted" style="width: 100%; text-align: center; padding: 20px 0; display: none;" id="industriesPlaceholder">Click to select industries...</div>';
+    }
+    
+    function removeIndustry(industry) {
+      selectedIndustries = selectedIndustries.filter(i => i !== industry);
+      updateIndustriesDisplay();
+      renderIndustriesList();
+    }
+    
+    function clearIndustries() {
+      selectedIndustries = [];
+      updateIndustriesDisplay();
+      renderIndustriesList();
+    }
+    
+    function closeIndustriesModal() {
+      document.getElementById('industriesModal').style.display = 'none';
+    }
+    
+    // Open modal when clicking selector
+    document.getElementById('industriesSelector')?.addEventListener('click', () => {
+      document.getElementById('industriesModal').style.display = 'flex';
+    });
+    
+    // Make selected industries available globally
+    window.getSelectedIndustries = () => selectedIndustries;
   </script>
 </body>
 </html>
