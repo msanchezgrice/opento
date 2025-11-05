@@ -1126,12 +1126,13 @@ function initializeChat() {
     const generateResponse = async (input)=> {
       const lower = input.toLowerCase();
 
-      // Check for "yes/ready" response to open intro form
-      if(lower.match(/yes|yeah|sure|okay|ok|ready|let'?s do it|send/)){
+      // Check for explicit request to open intro form (only if user explicitly asks)
+      if(lower.match(/^(yes|yeah|sure|okay|ok|ready|let'?s do it|i want to send|send intro|request intro)$/i)){
         setTimeout(()=> {
           chatModal.style.display = 'none';
-          if(modal){
-            modal.style.display = 'flex';
+          const introModal = qs('#introModal');
+          if(introModal){
+            introModal.style.display = 'flex';
             track('Chat to Intro Conversion');
             qs('#introName')?.focus();
           }
