@@ -42,43 +42,29 @@ export default async function handler(req, res) {
 
     const { access_token } = await tokenResponse.json();
 
-    // Fetch user profile from LinkedIn
-    const profileResponse = await fetch('https://api.linkedin.com/v2/me', {
+    // Fetch user profile using OpenID Connect userinfo endpoint
+    const profileResponse = await fetch('https://api.linkedin.com/v2/userinfo', {
       headers: {
-        'Authorization': `Bearer ${access_token}`,
-        'X-Restli-Protocol-Version': '2.0.0'
+        'Authorization': `Bearer ${access_token}`
       }
     });
 
     if (!profileResponse.ok) {
-      console.error('Profile fetch failed');
+      console.error('Profile fetch failed:', await profileResponse.text());
       return res.redirect('/onboarding.html?error=profile_failed');
     }
 
     const profile = await profileResponse.json();
+    console.log('LinkedIn profile:', profile);
 
-    // Fetch email address (separate endpoint)
-    const emailResponse = await fetch('https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))', {
-      headers: {
-        'Authorization': `Bearer ${access_token}`,
-        'X-Restli-Protocol-Version': '2.0.0'
-      }
-    });
-
-    let email = '';
-    if (emailResponse.ok) {
-      const emailData = await emailResponse.json();
-      email = emailData.elements?.[0]?.['handle~']?.emailAddress || '';
-    }
-
-    // Build profile data object
+    // OpenID Connect returns profile in different format
     const linkedInData = {
-      id: profile.id,
-      firstName: profile.localizedFirstName || '',
-      lastName: profile.localizedLastName || '',
-      email: email,
-      headline: profile.headline || '',
-      profilePicture: profile.profilePicture?.['displayImage~']?.elements?.[0]?.identifiers?.[0]?.identifier || '',
+      id: profile.sub || '',
+      firstName: profile.given_name || '',
+      lastName: profile.family_name || '',
+      email: profile.email || '',
+      headline: '', // Not available in basic OpenID Connect profile
+      profilePicture: profile.picture || '',
       // Store full profile for later use
       rawProfile: profile
     };

@@ -17,13 +17,13 @@ export default async function handler(req, res) {
     // Generate random state for CSRF protection
     const state = Math.random().toString(36).substring(7);
 
-    // Build LinkedIn OAuth URL
+    // Build LinkedIn OAuth URL (using OpenID Connect)
     const authUrl = new URL('https://www.linkedin.com/oauth/v2/authorization');
     authUrl.searchParams.set('response_type', 'code');
     authUrl.searchParams.set('client_id', clientId);
     authUrl.searchParams.set('redirect_uri', redirectUri);
     authUrl.searchParams.set('state', state);
-    authUrl.searchParams.set('scope', 'r_liteprofile r_emailaddress');
+    authUrl.searchParams.set('scope', 'openid profile email');
 
     console.log('Redirecting to LinkedIn OAuth:', authUrl.toString());
 
