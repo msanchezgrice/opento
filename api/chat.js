@@ -34,54 +34,60 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'API key not configured' });
     }
 
-    // Build system prompt with agent data
-    const systemPrompt = `You are the Rep (representative) for ${agentData.displayName}, a talented professional offering their services. Your role is to help potential brands and clients learn about ${agentData.displayName}'s availability, expertise, rates, and how to work together.
+    // Build system prompt with agent data (with safe defaults for missing fields)
+    const displayName = agentData.displayName || agentData.display_name || 'the agent';
+    const handle = agentData.handle || 'agent';
+    const role = agentData.role || 'Professional';
+    const location = agentData.location || 'Remote';
+    const summary = agentData.summary || 'Experienced professional';
+    const availability = agentData.availability || 'By appointment';
+    const rulesSummary = agentData.rulesSummary || 'Standard consulting rates';
+    
+    const onboarding = agentData.onboarding || {};
+    const consultFloor = onboarding.floor || agentData.settings?.consult_floor_30m || 75;
+    const asyncFloor = onboarding.microFloor || agentData.settings?.async_floor_5m || 12;
+    const weeklyHours = onboarding.hours || agentData.settings?.weekly_hours || 6;
+    
+    const openTo = agentData.openTo || agentData.open_to || [];
+    const focusAreas = agentData.focusAreas || agentData.focus_areas || [];
+    const recentWins = agentData.recentWins || agentData.recent_wins || [];
+    const socialProof = agentData.socialProof || agentData.social_proof || [];
+    const skills = agentData.skills || [];
+    
+    const systemPrompt = `You are the Rep (representative) for ${displayName}, a talented professional offering their services. Your role is to help answer questions about ${displayName}'s availability, expertise, rates, and how to work together.
 
 AGENT PROFILE:
-- Name: ${agentData.displayName}
-- Handle: @${agentData.handle}
-- Role: ${agentData.role}
-- Location: ${agentData.location}
-- Summary: ${agentData.summary}
+- Name: ${displayName}
+- Handle: @${handle}
+- Role: ${role}
+- Location: ${location}
+- Summary: ${summary}
 
 AVAILABILITY:
-- Schedule: ${agentData.availability}
-- Weekly capacity: ${agentData.onboarding.hours} hours per week
-- Rules: ${agentData.rulesSummary}
+- Schedule: ${availability}
+- Weekly capacity: ${weeklyHours} hours per week
+- Rules: ${rulesSummary}
 
 RATES:
-- Consulting calls: $${agentData.onboarding.floor} per 30 minutes
-- Async tasks: $${agentData.onboarding.microFloor} per 5 minutes
+- Consulting calls: $${consultFloor} per 30 minutes
+- Async tasks: $${asyncFloor} per 5 minutes
 
-WHAT ${agentData.displayName.toUpperCase()} IS TAKING ON:
-${agentData.openTo.map(item => `- ${item}`).join('\n')}
-
-FOCUS AREAS:
-${agentData.focusAreas.map(item => `- ${item}`).join('\n')}
-
-RECENT WINS:
-${agentData.recentWins.map(item => `- ${item}`).join('\n')}
-
-CREDENTIALS & PROOF:
-${agentData.socialProof.map(item => `- ${item}`).join('\n')}
-
-INTRO PROCESS:
-${agentData.requestIntro.pitch}
-
-Guidelines for intro requests:
-${agentData.requestIntro.guidelines.map((g, i) => `${i + 1}. ${g}`).join('\n')}
-
-Note: ${agentData.requestIntro.note}
+${openTo.length > 0 ? `WHAT ${displayName.toUpperCase()} IS TAKING ON:\n${openTo.map(item => `- ${item}`).join('\n')}\n` : ''}
+${focusAreas.length > 0 ? `FOCUS AREAS:\n${focusAreas.map(item => `- ${item}`).join('\n')}\n` : ''}
+${recentWins.length > 0 ? `RECENT WINS:\n${recentWins.map(item => `- ${item}`).join('\n')}\n` : ''}
+${socialProof.length > 0 ? `CREDENTIALS & PROOF:\n${socialProof.map(item => `- ${item}`).join('\n')}\n` : ''}
+${skills.length > 0 ? `SKILLS:\n${skills.join(', ')}\n` : ''}
 
 YOUR COMMUNICATION STYLE:
 - Be warm, professional, and helpful
 - Keep responses concise (2-3 short paragraphs max)
 - Focus on answering the specific question asked
-- If asked about requesting an intro or working together, encourage them to proceed
-- When they're ready to move forward, tell them to say "yes" or "ready" and you'll help them submit a formal intro request
+- If asked about rates, availability, or expertise, provide specific details from the profile above
+- If asked about working together, explain the intro request process and encourage them to proceed
+- For dashboard users asking about their OWN settings, provide advice on optimizing rates, availability, and profile completeness
 - Don't make up information - only use the data provided above
-- Refer to the agent by their first name (${agentData.displayName.split(' ')[0]})
-- Sign off as "Rep" or "${agentData.displayName}'s Rep" when appropriate
+- Refer to the agent by their first name (${displayName.split(' ')[0]})
+- Sign off as "Rep" or "${displayName}'s Rep" when appropriate
 
 FORMATTING RULES:
 **CRITICAL:** Your responses will be rendered as HTML in a chat interface. You MUST use HTML formatting, NOT markdown.
