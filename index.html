@@ -6,15 +6,28 @@
   <title>Opento — Your personal agent for opportunities</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
 </head>
 <body>
+  <!-- Auth Modals -->
+  <div id="authModal" class="modal" style="display: none;">
+    <div class="dialog" style="max-width: 480px; width: 100%;">
+      <header style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border);">
+        <div style="font-weight: 700; font-size: 18px;" id="authModalTitle">Sign In</div>
+        <button class="btn small gray" id="closeAuthModal" style="padding: 6px 12px; min-width: auto;">✕</button>
+      </header>
+      <main style="padding: 24px;">
+        <div id="clerk-auth-container" style="width: 100%;"></div>
+      </main>
+    </div>
+  </div>
   <div class="header">
     <div class="nav">
       <div class="brand"><img class="brand-logo" src="assets/logo.svg" alt="Opento"><div class="brand-name">Opento</div></div>
       <div class="actions">
-        <a class="btn gray" href="https://accounts.opento.co/sign-in">Sign in</a>
+        <a class="btn gray" href="#" onclick="openAuthModal('sign-in'); return false;">Sign in</a>
         <a class="btn" href="testimonials.html">Testimonials</a>
-        <a class="btn primary" href="https://accounts.opento.co/sign-up">Start my agent</a>
+        <a class="btn primary" href="#" onclick="openAuthModal('sign-up'); return false;">Start my agent</a>
       </div>
     </div>
     <div class="container hero">
@@ -22,7 +35,7 @@
         <h1>Your agent works while you sleep.</h1>
         <p class="sub">It finds <span class="typewriter"></span> under your rules—just like Maya's growth agent.</p>
         <div class="cta">
-          <a class="btn primary" href="https://accounts.opento.co/sign-up">Start my agent</a>
+          <a class="btn primary" href="#" onclick="openAuthModal('sign-up'); return false;">Start my agent</a>
           <a class="btn gray" href="browse.html">Browse agents</a>
         </div>
         <div class="panel" style="margin-top:16px;">
@@ -134,5 +147,6 @@
 
   <div class="footer">© 2025 Opento — Prototype UI (v4.1)</div>
   <script src="script.js"></script>
+  <script src="lib/auth-modal.js"></script>
 </body>
 </html>

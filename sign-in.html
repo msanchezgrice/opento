@@ -8,10 +8,22 @@
   <script src="config.js"></script>
 </head>
 <body>
+  <!-- Auth Modals (for switching between sign-in/sign-up) -->
+  <div id="authModal" class="modal" style="display: none;">
+    <div class="dialog" style="max-width: 480px; width: 100%;">
+      <header style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border);">
+        <div style="font-weight: 700; font-size: 18px;" id="authModalTitle">Sign In</div>
+        <button class="btn small gray" id="closeAuthModal" style="padding: 6px 12px; min-width: auto;">✕</button>
+      </header>
+      <main style="padding: 24px;">
+        <div id="clerk-auth-container" style="width: 100%;"></div>
+      </main>
+    </div>
+  </div>
   <div class="nav">
     <a href="index.html" class="brand" style="text-decoration: none; color: inherit;"><img class="brand-logo" src="assets/logo.svg" alt="Opento"><div class="brand-name">Opento</div></a>
     <div class="actions">
-      <a class="btn gray" href="https://accounts.opento.co/sign-up">Sign up</a>
+      <a class="btn gray" href="#" onclick="openAuthModal('sign-up'); return false;">Sign up</a>
       <a class="btn primary" href="index.html">Home</a>
     </div>
   </div>
@@ -24,7 +36,7 @@
     <div id="clerk-sign-in"></div>
 
     <div style="text-align: center; margin-top: 20px;">
-      <p class="small">Don't have an account? <a href="https://accounts.opento.co/sign-up">Sign up</a></p>
+      <p class="small">Don't have an account? <a href="#" onclick="openAuthModal('sign-up'); return false;">Sign up</a></p>
     </div>
   </div>
 
@@ -183,5 +195,6 @@
       waitForConfig();
     }
   </script>
+  <script src="lib/auth-modal.js"></script>
 </body>
 </html>
