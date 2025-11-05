@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <title>My Dashboard — Opento</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
   <link rel="stylesheet" href="styles.css">
   <script src="config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -50,6 +52,7 @@
       <div class="card" style="margin-bottom: 24px;">
         <div style="display: flex; gap: 16px; border-bottom: 1px solid var(--border); padding-bottom: 0;">
           <button class="tab-btn active" data-tab="profile" style="padding: 12px 16px; border: none; background: none; cursor: pointer; border-bottom: 2px solid var(--primary); font-weight: 600; color: var(--primary);">Profile</button>
+          <button class="tab-btn" data-tab="agent-settings" style="padding: 12px 16px; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500; color: var(--muted);">Agent Settings</button>
           <button class="tab-btn" data-tab="settings" style="padding: 12px 16px; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500; color: var(--muted);">Settings</button>
           <button class="tab-btn" data-tab="skills" style="padding: 12px 16px; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500; color: var(--muted);">Skills</button>
           <button class="tab-btn" data-tab="intros" style="padding: 12px 16px; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500; color: var(--muted);">Intro Requests</button>
@@ -120,6 +123,75 @@
               <button type="button" class="btn gray" onclick="window.location.reload()" style="margin-left: 12px;">Cancel</button>
             </div>
           </form>
+        </div>
+      </div>
+
+      <!-- Agent Settings Tab (NEW) -->
+      <div class="tab-content" data-tab="agent-settings" style="display: none;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+          <!-- Left: Settings Summary -->
+          <div class="card">
+            <h2>Your Agent Settings</h2>
+            <p class="small" style="color: #64748b; margin-bottom: 24px;">Review your agent configuration at a glance.</p>
+            
+            <div style="display: grid; gap: 20px;">
+              <div>
+                <div class="small muted" style="text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Rates</div>
+                <div><strong id="summaryConsultFloor">$75</strong> per 30 min consult</div>
+                <div><strong id="summaryAsyncFloor">$12</strong> per 5 min async task</div>
+              </div>
+              
+              <div>
+                <div class="small muted" style="text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Availability</div>
+                <div><strong id="summaryWeeklyHours">6</strong> hours per week</div>
+                <div id="summaryAvailabilityWindow">Mon–Thu 11a–4p CT</div>
+              </div>
+              
+              <div>
+                <div class="small muted" style="text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Work Categories</div>
+                <div id="summaryCategories" class="chips" style="margin-top: 8px;">
+                  <div class="chip">Loading...</div>
+                </div>
+              </div>
+              
+              <div>
+                <div class="small muted" style="text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Privacy</div>
+                <div id="summaryPrivacy">
+                  <div style="margin-bottom: 4px;">✓ Anonymous first</div>
+                  <div>✓ Consent reminders</div>
+                </div>
+              </div>
+              
+              <div style="margin-top: 16px;">
+                <button class="btn gray" onclick="document.querySelector('[data-tab=settings]').click()">Edit Settings</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right: Chat with Your Rep -->
+          <div class="card">
+            <h2>Chat with Your Rep</h2>
+            <p class="small" style="color: #64748b; margin-bottom: 20px;">Ask questions about your agent settings and how to optimize your profile.</p>
+            
+            <div id="agentChat" style="display: flex; flex-direction: column; height: 500px;">
+              <div id="agentChatMessages" style="flex: 1; overflow-y: auto; padding: 16px; background: #f8fafc; border-radius: 12px; margin-bottom: 16px;"></div>
+              
+              <div style="display: flex; gap: 8px;">
+                <input 
+                  type="text" 
+                  id="agentChatInput" 
+                  placeholder="Ask your rep anything..." 
+                  style="flex: 1; padding: 12px; border: 2px solid var(--border); border-radius: 12px; font-size: 15px;"
+                  onkeypress="if(event.key==='Enter') sendAgentChat()"
+                >
+                <button class="btn primary" onclick="sendAgentChat()" style="padding: 12px 24px;">Send</button>
+              </div>
+              
+              <div style="margin-top: 12px;">
+                <div class="chips" id="agentChatSuggestions"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
