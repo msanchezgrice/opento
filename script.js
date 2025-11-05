@@ -1055,15 +1055,23 @@ function handlePageInit(){
   const chatSuggestions = qs('#chatSuggestions');
 
   if(chatModal && chatBtn){
-    // Use current agent data if available, fallback to demo agent
-    const agent = window.currentAgentData || demoAgent;
-    const agentName = agent.display_name || agent.displayName || 'Agent';
-    const firstName = agentName.split(' ')[0];
-    
-    setText('#displayNameChat', firstName);
+    // Get agent data when chat is opened
+    let agent = null;
     const chatState = { history: [], awaitingInput: false };
 
     const openChat = ()=> {
+      // Get current agent data
+      agent = window.currentAgentData;
+      
+      if (!agent) {
+        toast('Error: Agent data not loaded. Please refresh the page.');
+        return;
+      }
+      
+      const agentName = agent.display_name || agent.displayName || 'Agent';
+      const firstName = agentName.split(' ')[0];
+      setText('#displayNameChat', firstName);
+      
       chatModal.style.display='flex';
       track('Chat Opened');
       if(chatState.history.length === 0){
@@ -1082,7 +1090,7 @@ function handlePageInit(){
       msg.className = `chat-message ${isBot ? 'bot' : 'user'}`;
       const avatar = document.createElement('div');
       avatar.className = 'avatar';
-      const agentAvatar = agent.avatar_initials || agent.avatar || firstName.substring(0,2).toUpperCase();
+      const agentAvatar = agent ? (agent.avatar_initials || agent.avatar || 'AG') : 'AG';
       avatar.textContent = isBot ? agentAvatar : 'Y';
       const bubble = document.createElement('div');
       bubble.className = 'bubble';
@@ -1146,6 +1154,11 @@ function handlePageInit(){
           }
         }, 1000);
         return `Great! Opening the intro request form for you now...`;
+      }
+
+      // Make sure we have agent data
+      if (!agent) {
+        return `I'm having trouble loading agent information. Please refresh the page and try again.`;
       }
 
       // Call backend API for AI response

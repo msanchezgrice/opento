@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Test Sign In — Opento (Dev Only)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
+  <script src="lib/session.js"></script>
+</head>
+<body style="background: #f8fafc;">
+  <div class="container section" style="max-width: 600px; margin-top: 80px;">
+    <div class="card">
+      <h1>Test Sign In</h1>
+      <p class="small" style="color: #991b1b; background: #fef2f2; padding: 12px; border-radius: 8px; border: 1px solid #fecaca;">
+        ⚠️ <strong>Development Only</strong> - This page is for testing user switching. Remove in production.
+      </p>
+
+      <div style="margin-top: 24px;">
+        <h3>Current Session</h3>
+        <div id="currentSession" style="background: #f1f5f9; padding: 16px; border-radius: 8px; margin-top: 12px;">
+          <div class="small muted">Loading...</div>
+        </div>
+      </div>
+
+      <div style="margin-top: 24px;">
+        <h3>Sign In As User</h3>
+        <p class="small">Enter any user's handle to sign in as them (for testing)</p>
+        
+        <form id="testSignInForm" style="margin-top: 16px;">
+          <label class="input">
+            <span>User Handle</span>
+            <input 
+              type="text" 
+              id="handleInput" 
+              placeholder="e.g., john-smith-a4b2" 
+              required
+              autocomplete="off"
+            >
+            <div class="small muted">The unique handle from their agent page URL</div>
+          </label>
+          
+          <div style="display: flex; gap: 12px; margin-top: 16px;">
+            <button type="submit" class="btn primary">Sign In</button>
+            <button type="button" id="signOutBtn" class="btn gray">Sign Out</button>
+          </div>
+        </form>
+
+        <div id="signInResult" style="margin-top: 16px;"></div>
+      </div>
+
+      <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #e2e8f0;">
+        <h3>Quick Links</h3>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;">
+          <a href="index.html" class="btn gray">← Back to Home</a>
+          <a href="dashboard.html" class="btn">Go to Dashboard</a>
+          <a href="browse.html" class="btn gray">Browse Agents</a>
+        </div>
+      </div>
+
+      <div style="margin-top: 24px;">
+        <h3>How to Use</h3>
+        <ol class="list-numbered" style="margin-top: 12px;">
+          <li>Create a new agent through normal onboarding</li>
+          <li>Note the handle from the URL (e.g., <code>handle.html?u=<strong>john-smith-a4b2</strong></code>)</li>
+          <li>Come back here and enter that handle</li>
+          <li>Click "Sign In" to load that user's session</li>
+          <li>Now you can access their dashboard and test features</li>
+          <li>Use "Sign Out" to clear and test with a different user</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Display current session
+    function updateSessionDisplay() {
+      const sessionDiv = document.getElementById('currentSession');
+      const user = getCurrentUser();
+      
+      if (user) {
+        const age = opentoSession.getSessionAge();
+        const ageText = age < 1 ? 'Less than 1 hour' : `${Math.floor(age)} hours`;
+        
+        sessionDiv.innerHTML = `
+          <div><strong>Signed in as:</strong> ${user.name} (@${user.handle})</div>
+          <div class="small muted" style="margin-top: 4px;">User ID: ${user.id}</div>
+          <div class="small muted">Session age: ${ageText}</div>
+          <div style="margin-top: 12px;">
+            <a href="handle.html?u=${user.handle}" class="btn small">View My Profile</a>
+            <a href="dashboard.html" class="btn small primary" style="margin-left: 8px;">My Dashboard</a>
+          </div>
+        `;
+      } else {
+        sessionDiv.innerHTML = '<div class="small muted">Not signed in</div>';
+      }
+    }
+
+    // Handle form submission
+    document.getElementById('testSignInForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const handle = document.getElementById('handleInput').value.trim();
+      const resultDiv = document.getElementById('signInResult');
+      
+      if (!handle) {
+        resultDiv.innerHTML = '<div class="small" style="color: #991b1b;">Please enter a handle</div>';
+        return;
+      }
+      
+      resultDiv.innerHTML = '<div class="small">Signing in...</div>';
+      
+      try {
+        const userData = await opentoSession.testSignIn(handle);
+        
+        resultDiv.innerHTML = `
+          <div class="card" style="background: #f0fdf4; border-color: #bbf7d0;">
+            <div style="color: #166534;"><strong>✓ Success!</strong></div>
+            <div class="small" style="color: #166534; margin-top: 4px;">
+              Signed in as ${userData.displayName} (@${userData.handle})
+            </div>
+            <div style="margin-top: 12px;">
+              <a href="dashboard.html" class="btn primary">Go to Dashboard</a>
+            </div>
+          </div>
+        `;
+        
+        updateSessionDisplay();
+        document.getElementById('handleInput').value = '';
+        
+      } catch (error) {
+        resultDiv.innerHTML = `
+          <div class="card" style="background: #fef2f2; border-color: #fecaca;">
+            <div style="color: #991b1b;"><strong>Error:</strong> ${error.message}</div>
+            <div class="small" style="color: #991b1b; margin-top: 4px;">
+              Make sure the handle exists. Create an agent first through onboarding.
+            </div>
+          </div>
+        `;
+      }
+    });
+
+    // Handle sign out
+    document.getElementById('signOutBtn').addEventListener('click', () => {
+      if (confirm('Sign out and clear session?')) {
+        signOut();
+        document.getElementById('signInResult').innerHTML = `
+          <div class="card" style="background: #f1f5f9;">
+            <div class="small">Signed out successfully</div>
+          </div>
+        `;
+        updateSessionDisplay();
+      }
+    });
+
+    // Initial display
+    updateSessionDisplay();
+  </script>
+</body>
+</html>
