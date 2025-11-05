@@ -11,6 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="lib/supabase-client.js"></script>
   <script src="lib/session.js"></script>
+  <script src="lib/resume-upload.js"></script>
 </head>
 <body class="onboarding-page">
   <div class="app-nav">
@@ -33,23 +34,43 @@
             <p class="sub">Help us understand your background so we can match you with the right opportunities.</p>
           </div>
           
-          <!-- LinkedIn Import Option -->
-          <div id="linkedInImportSection" style="background: linear-gradient(135deg, #0077B5, #00A0DC); border-radius: 16px; padding: 24px; margin-bottom: 32px; color: white;">
-            <div style="display: flex; align-items: center; gap: 16px;">
-              <div style="font-size: 48px;">in</div>
-              <div style="flex: 1;">
-                <h3 style="margin: 0 0 8px; color: white;">Import from LinkedIn</h3>
-                <p style="margin: 0; opacity: 0.95; font-size: 15px;">Automatically fill your profile with your LinkedIn data. Much faster than manual entry!</p>
-              </div>
-              <button type="button" id="linkedInImportBtn" class="btn" style="background: white; color: #0077B5; font-weight: 700; padding: 12px 24px; white-space: nowrap;">
+          <!-- Quick Import Options -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px;">
+            <!-- LinkedIn Import -->
+            <div id="linkedInImportSection" style="background: linear-gradient(135deg, #0077B5, #00A0DC); border-radius: 16px; padding: 24px; color: white; cursor: pointer;" onclick="document.getElementById('linkedInImportBtn').click()">
+              <div style="font-size: 40px; margin-bottom: 12px;">in</div>
+              <h3 style="margin: 0 0 8px; color: white;">Import from LinkedIn</h3>
+              <p style="margin: 0 0 16px; opacity: 0.95; font-size: 14px;">Auto-fill from your LinkedIn profile</p>
+              <button type="button" id="linkedInImportBtn" class="btn" style="background: white; color: #0077B5; font-weight: 700; padding: 10px 20px; width: 100%;" onclick="event.stopPropagation()">
                 Import Profile
+              </button>
+            </div>
+            
+            <!-- Resume Upload -->
+            <div id="resumeUploadSection" style="background: linear-gradient(135deg, #7C3AED, #A78BFA); border-radius: 16px; padding: 24px; color: white; cursor: pointer;" onclick="document.getElementById('resumeInput').click()">
+              <div style="font-size: 40px; margin-bottom: 12px;">📄</div>
+              <h3 style="margin: 0 0 8px; color: white;">Upload Resume</h3>
+              <p style="margin: 0 0 16px; opacity: 0.95; font-size: 14px;">Parse your resume with AI (PDF/DOCX)</p>
+              <input type="file" id="resumeInput" accept=".pdf,.docx" style="display: none;" onchange="handleResumeUpload(event)">
+              <button type="button" class="btn" style="background: white; color: #7C3AED; font-weight: 700; padding: 10px 20px; width: 100%;" onclick="event.stopPropagation(); document.getElementById('resumeInput').click()">
+                Choose File
               </button>
             </div>
           </div>
           
-          <!-- Success message (hidden by default) -->
+          <!-- Success messages (hidden by default) -->
           <div id="linkedInSuccess" style="display: none; background: #f0f9ff; border: 2px solid #0077B5; border-radius: 12px; padding: 16px; margin-bottom: 24px; color: #0077B5;">
             <strong>✓ LinkedIn profile imported!</strong> Review the pre-filled information below and make any changes.
+          </div>
+          
+          <div id="resumeSuccess" style="display: none; background: #f5f3ff; border: 2px solid #7C3AED; border-radius: 12px; padding: 16px; margin-bottom: 24px; color: #7C3AED;">
+            <strong>✓ Resume parsed successfully!</strong> Review the pre-filled information below and make any changes.
+          </div>
+          
+          <div id="resumeLoading" style="display: none; background: #f5f3ff; border: 2px solid #7C3AED; border-radius: 12px; padding: 16px; margin-bottom: 24px; color: #7C3AED; text-align: center;">
+            <div style="display: inline-block; animation: spin 1s linear infinite; font-size: 24px; margin-bottom: 8px;">⏳</div>
+            <div><strong>Parsing your resume with AI...</strong></div>
+            <div class="small" style="margin-top: 4px;">This may take 10-15 seconds</div>
           </div>
           
           <div class="inputs">
