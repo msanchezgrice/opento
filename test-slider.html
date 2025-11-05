@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Slider Test</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body style="padding: 40px;">
+  <h1>Slider Test</h1>
+  
+  <div style="max-width: 600px;">
+    <label class="input availability-slider">
+      <span>Weekly hours target</span>
+      <input id="hours" type="range" min="0" max="20" value="6" aria-label="Weekly hours target">
+      <span id="hoursVal" class="chip large-chip" aria-live="polite">6 hrs / week</span>
+      <div class="small muted">Test if slider responds to input</div>
+    </label>
+    
+    <div style="margin-top: 20px;">
+      <div>Current value: <strong id="currentValue">6</strong></div>
+      <div>Events fired: <strong id="eventCount">0</strong></div>
+    </div>
+  </div>
+  
+  <script>
+    let count = 0;
+    const hoursInput = document.getElementById('hours');
+    const hoursVal = document.getElementById('hoursVal');
+    const currentValue = document.getElementById('currentValue');
+    const eventCount = document.getElementById('eventCount');
+    
+    hoursInput.addEventListener('input', function() {
+      count++;
+      const value = this.value;
+      hoursVal.textContent = `${value} hrs / week`;
+      currentValue.textContent = value;
+      eventCount.textContent = count;
+      console.log('Slider changed to:', value);
+    });
+    
+    console.log('Slider test loaded. Try moving the slider.');
+  </script>
+</body>
+</html>
