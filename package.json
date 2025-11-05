@@ -6,6 +6,9 @@
     "build": "echo 'Static site - no build needed'",
     "dev": "python3 -m http.server 8080"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  }
 }
 
