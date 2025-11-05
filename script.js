@@ -1001,7 +1001,14 @@ function handlePageInit(){
     // Form submission is now handled by handle-integration.js
   }
 
-  // Chat functionality - only initialize if we're on handle page
+  // Initialize chat - wait for agent data to load
+  initializeChat();
+}
+
+function initializeChat() {
+  // Chat functionality - only on handle page
+  if(!document.body.classList.contains('handle-page')) return;
+
   const chatModal = qs('#chatModal');
   const chatBtn = qs('#chatWithRep');
   const chatMessages = qs('#chatMessages');
@@ -1009,14 +1016,17 @@ function handlePageInit(){
   const chatSend = qs('#chatSend');
   const chatSuggestions = qs('#chatSuggestions');
 
-  // Skip chat init if not on handle page
-  const isHandlePage = document.body.classList.contains('handle-page');
-  if(!isHandlePage) return;
-
   if(chatModal && chatBtn){
+    // Track if chat is already initialized
+    if (chatBtn._chatInitialized) {
+      console.log('Chat already initialized');
+      return;
+    }
+    chatBtn._chatInitialized = true;
+
     // Get agent data when chat is opened
     let agent = null;
-    const chatState = { history: [], awaitingInput: false };
+    const chatState = { history: [], awaitingResponse: false };
 
     const openChat = ()=> {
       // Get current agent data
