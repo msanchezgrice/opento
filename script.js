@@ -1064,8 +1064,15 @@ function initializeChat() {
       msg.className = `chat-message ${isBot ? 'bot' : 'user'}`;
       const avatar = document.createElement('div');
       avatar.className = 'avatar';
-      const agentAvatar = agent ? (agent.avatar_initials || agent.avatar || 'AG') : 'AG';
-      avatar.textContent = isBot ? agentAvatar : 'Y';
+      
+      // Show photo for bot if available, otherwise initials
+      if (isBot && agent && agent.avatar_url) {
+        avatar.innerHTML = `<img src="${agent.avatar_url}" alt="Agent" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+      } else {
+        const agentAvatar = agent ? (agent.avatar_initials || agent.avatar || 'AG') : 'AG';
+        avatar.textContent = isBot ? agentAvatar : 'Y';
+      }
+      
       const bubble = document.createElement('div');
       bubble.className = 'bubble';
       bubble.innerHTML = text;

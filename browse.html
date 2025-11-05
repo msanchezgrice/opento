@@ -127,8 +127,11 @@
       return `
         <div class="card" style="display: flex; flex-direction: column; gap: 12px;">
           <div style="display: flex; gap: 12px; align-items: start;">
-            <div class="handle-avatar" style="width: 48px; height: 48px; font-size: 18px;">
-              ${agent.avatar_initials || 'U'}
+            <div class="handle-avatar" style="width: 48px; height: 48px; font-size: 18px; overflow: hidden;">
+              ${agent.avatar_url 
+                ? `<img src="${agent.avatar_url}" alt="${agent.display_name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` 
+                : (agent.avatar_initials || 'U')
+              }
             </div>
             <div style="flex: 1;">
               <strong>${agent.display_name || 'Anonymous'}</strong>
