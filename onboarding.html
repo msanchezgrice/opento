@@ -160,38 +160,17 @@
           <div class="step-header">
             <div class="step-number">4</div>
             <h2>What are you open to?</h2>
-            <p class="sub">Select the types of work you'd like your agent to find for you.</p>
+            <p class="sub">Select the types of work you'd like your agent to find for you. <span id="suggestionsNote" style="color: var(--primary); font-weight: 600;"></span></p>
           </div>
-          <div class="options-grid">
-            <div class="option-card" data-category="audits">
-              <div class="option-card-header">
-                <div class="switch on" data-label="Growth audits"></div>
-                <h3>Growth audits & consults</h3>
-              </div>
-              <p class="small">30-minute deep dives on CAC, retention, and channel mix goals.</p>
-            </div>
-            <div class="option-card" data-category="campaigns">
-              <div class="option-card-header">
-                <div class="switch on" data-label="Campaign optimization"></div>
-                <h3>Campaign setup & optimization</h3>
-              </div>
-              <p class="small">Hands-on experiment sprints and reporting clean-up.</p>
-            </div>
-            <div class="option-card" data-category="retainers">
-              <div class="option-card-header">
-                <div class="switch on" data-label="Fractional retainers"></div>
-                <h3>Fractional retainers</h3>
-              </div>
-              <p class="small">8–12 hr/week support with async updates.</p>
-            </div>
-            <div class="option-card" data-category="labeling">
-              <div class="option-card-header">
-                <div class="switch on" data-label="Data labeling"></div>
-                <h3>Data labeling & QA</h3>
-              </div>
-              <p class="small">Tagging hooks, funnel QA, event taxonomy clean-up.</p>
-            </div>
+          
+          <!-- Loading state -->
+          <div id="opportunitiesLoading" style="text-align: center; padding: 60px 20px; display: none;">
+            <div class="small muted">Loading personalized suggestions based on your skills...</div>
           </div>
+          
+          <!-- Dynamic opportunities grid -->
+          <div id="opportunitiesGrid" class="options-grid"></div>
+          
           <div class="step-actions">
             <button class="btn gray" data-back>Back</button>
             <button class="btn primary" data-next>Continue</button>
@@ -309,12 +288,136 @@
   <script src="lib/skills-selector.js"></script>
   <script src="lib/onboarding-integration.js"></script>
   <script>
+    // Redirect signed-in users to dashboard
+    if (window.opentoSession && window.opentoSession.isSignedIn()) {
+      console.log('User already signed in, redirecting to dashboard');
+      window.location.href = 'dashboard.html';
+    }
+    
     // Initialize skills selector when page loads
     document.addEventListener('DOMContentLoaded', () => {
       if (window.initializeSkillsSelector) {
         window.initializeSkillsSelector();
       }
+      
+      // Load smart opportunities when user reaches step 4
+      const wizard = document.querySelector('.wizard');
+      if (wizard) {
+        const observer = new MutationObserver(() => {
+          const step4 = document.querySelector('.step[data-step="4"]');
+          if (step4 && step4.style.display !== 'none') {
+            loadSmartOpportunities();
+          }
+        });
+        observer.observe(wizard, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
+      }
     });
+    
+    // Load smart opportunity suggestions based on selected skills
+    async function loadSmartOpportunities() {
+      const loading = document.getElementById('opportunitiesLoading');
+      const grid = document.getElementById('opportunitiesGrid');
+      const note = document.getElementById('suggestionsNote');
+      
+      // Only load once
+      if (grid && grid.dataset.loaded === 'true') return;
+      
+      try {
+        // Show loading
+        if (loading) loading.style.display = 'block';
+        if (grid) grid.innerHTML = '';
+        
+        // Get selected skills
+        const skills = window.getSelectedSkills ? window.getSelectedSkills() : [];
+        console.log('Loading opportunities for skills:', skills);
+        
+        if (skills.length === 0) {
+          // No skills - show generic options
+          renderGenericOpportunities();
+          return;
+        }
+        
+        // Fetch suggestions from API
+        const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+          ? 'http://localhost:3000/api'
+          : '/api';
+        
+        const response = await fetch(`${API_BASE}/opportunities/suggest?skills=${skills.join(',')}`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch suggestions');
+        }
+        
+        const data = await response.json();
+        console.log('✓ Smart opportunities loaded:', data);
+        
+        // Hide loading
+        if (loading) loading.style.display = 'none';
+        
+        // Update note
+        if (note) note.textContent = `✨ Personalized for your skills`;
+        
+        // Render opportunities
+        renderOpportunities(data.opportunities || []);
+        
+        if (grid) grid.dataset.loaded = 'true';
+        
+      } catch (error) {
+        console.error('Error loading opportunities:', error);
+        if (loading) loading.style.display = 'none';
+        renderGenericOpportunities();
+      }
+    }
+    
+    function renderOpportunities(opportunities) {
+      const grid = document.getElementById('opportunitiesGrid');
+      if (!grid) return;
+      
+      if (opportunities.length === 0) {
+        grid.innerHTML = '<div class="small muted" style="padding: 40px; text-align: center;">No suggestions available. Please go back and add more skills.</div>';
+        return;
+      }
+      
+      // Render first 12 opportunities
+      grid.innerHTML = opportunities.slice(0, 12).map((opp, idx) => `
+        <div class="option-card ${idx < 3 ? 'active' : ''}" data-category="${opp.toLowerCase().replace(/[^a-z0-9]+/g, '-')}">
+          <div class="option-card-header">
+            <div class="switch ${idx < 3 ? 'on' : ''}" data-label="${opp}"></div>
+            <h3>${opp}</h3>
+          </div>
+        </div>
+      `).join('');
+      
+      // Add click handlers
+      grid.querySelectorAll('.option-card').forEach(card => {
+        card.addEventListener('click', () => {
+          card.classList.toggle('active');
+          const switchEl = card.querySelector('.switch');
+          if (switchEl) switchEl.classList.toggle('on');
+        });
+      });
+    }
+    
+    function renderGenericOpportunities() {
+      const grid = document.getElementById('opportunitiesGrid');
+      const note = document.getElementById('suggestionsNote');
+      if (!grid) return;
+      
+      if (note) note.textContent = '';
+      
+      const genericOps = [
+        'Consulting calls',
+        'Advisory sessions',
+        'Strategy workshops',
+        'Expert review & feedback',
+        'Training sessions',
+        'Fractional retainers',
+        'Project-based work',
+        'Code review'
+      ];
+      
+      renderOpportunities(genericOps);
+    }
   </script>
 </body>
 </html>
