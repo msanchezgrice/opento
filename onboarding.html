@@ -50,8 +50,8 @@
             <div id="resumeUploadSection" style="background: linear-gradient(135deg, #7C3AED, #A78BFA); border-radius: 16px; padding: 24px; color: white; cursor: pointer;" onclick="document.getElementById('resumeInput').click()">
               <div style="font-size: 40px; margin-bottom: 12px;">📄</div>
               <h3 style="margin: 0 0 8px; color: white;">Upload Resume</h3>
-              <p style="margin: 0 0 16px; opacity: 0.95; font-size: 14px;">Parse your resume with AI (PDF/DOCX)</p>
-              <input type="file" id="resumeInput" accept=".pdf,.docx" style="display: none;" onchange="handleResumeUpload(event)">
+              <p style="margin: 0 0 16px; opacity: 0.95; font-size: 14px;">Parse your resume with AI (DOCX only)</p>
+              <input type="file" id="resumeInput" accept=".docx" style="display: none;" onchange="handleResumeUpload(event)">
               <button type="button" class="btn" style="background: white; color: #7C3AED; font-weight: 700; padding: 10px 20px; width: 100%;" onclick="event.stopPropagation(); document.getElementById('resumeInput').click()">
                 Choose File
               </button>

@@ -2,7 +2,7 @@
 // POST /api/resume/parse
 
 import { createClient } from '@supabase/supabase-js';
-import pdf from 'pdf-parse/lib/pdf-parse.js';
+// Note: pdf-parse doesn't work on Vercel serverless, using workaround
 import mammoth from 'mammoth';
 
 export default async function handler(req, res) {
@@ -36,13 +36,11 @@ export default async function handler(req, res) {
     const lowerFilename = filename.toLowerCase();
 
     if (lowerFilename.endsWith('.pdf')) {
-      try {
-        const pdfData = await pdf(buffer);
-        text = pdfData.text;
-      } catch (error) {
-        console.error('PDF parsing error:', error);
-        return res.status(400).json({ error: 'Failed to extract text from PDF. Please try a different file.' });
-      }
+      // PDF parsing temporarily disabled on Vercel (pdf-parse not serverless-compatible)
+      return res.status(400).json({ 
+        error: 'PDF support coming soon. Please convert your resume to DOCX or enter information manually.',
+        details: 'PDF parsing requires additional serverless configuration'
+      });
     } else if (lowerFilename.endsWith('.docx')) {
       try {
         const result = await mammoth.extractRawText({ buffer });
@@ -121,7 +119,7 @@ async function parseResumeWithGPT(resumeText) {
         'Authorization': `Bearer ${OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4o-2024-11-20', // Latest GPT-4o model
         messages: [
           {
             role: 'system',

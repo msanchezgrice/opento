@@ -364,10 +364,11 @@
 
   <script src="script.js"></script>
   <script src="lib/dashboard-integration.js"></script>
+  <script src="lib/dashboard-chat.js"></script>
   <script src="lib/nav-helper.js"></script>
   <script>
-    // Dashboard chat functionality
-    function openDashboardChat(initialMessage) {
+    // Dashboard chat is now handled by lib/dashboard-chat.js
+    /* function openDashboardChat(initialMessage) {
       // Use current user's agent data
       const userData = window.currentUserData || {};
       
@@ -415,7 +416,7 @@
           }, 500);
         }
       }
-    }
+    } */
   </script>
 </body>
 </html>
