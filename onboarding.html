@@ -30,6 +30,26 @@
             <h2>Tell us about yourself</h2>
             <p class="sub">Help us understand your background so we can match you with the right opportunities.</p>
           </div>
+          
+          <!-- LinkedIn Import Option -->
+          <div id="linkedInImportSection" style="background: linear-gradient(135deg, #0077B5, #00A0DC); border-radius: 16px; padding: 24px; margin-bottom: 32px; color: white;">
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <div style="font-size: 48px;">in</div>
+              <div style="flex: 1;">
+                <h3 style="margin: 0 0 8px; color: white;">Import from LinkedIn</h3>
+                <p style="margin: 0; opacity: 0.95; font-size: 15px;">Automatically fill your profile with your LinkedIn data. Much faster than manual entry!</p>
+              </div>
+              <button type="button" id="linkedInImportBtn" class="btn" style="background: white; color: #0077B5; font-weight: 700; padding: 12px 24px; white-space: nowrap;">
+                Import Profile
+              </button>
+            </div>
+          </div>
+          
+          <!-- Success message (hidden by default) -->
+          <div id="linkedInSuccess" style="display: none; background: #f0f9ff; border: 2px solid #0077B5; border-radius: 12px; padding: 16px; margin-bottom: 24px; color: #0077B5;">
+            <strong>✓ LinkedIn profile imported!</strong> Review the pre-filled information below and make any changes.
+          </div>
+          
           <div class="inputs">
             <label class="input">
               <span>Years of experience</span>
@@ -300,6 +320,9 @@
         window.initializeSkillsSelector();
       }
       
+      // Initialize LinkedIn import
+      initializeLinkedInImport();
+      
       // Load smart opportunities when user reaches step 4
       const wizard = document.querySelector('.wizard');
       if (wizard) {
@@ -312,6 +335,97 @@
         observer.observe(wizard, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
       }
     });
+    
+    // LinkedIn Import Functionality
+    function initializeLinkedInImport() {
+      const importBtn = document.getElementById('linkedInImportBtn');
+      
+      if (importBtn) {
+        importBtn.addEventListener('click', () => {
+          // Redirect to LinkedIn OAuth
+          window.location.href = '/api/auth/linkedin/authorize';
+        });
+      }
+      
+      // Check if returning from LinkedIn OAuth
+      const urlParams = new URLSearchParams(window.location.search);
+      const linkedInData = urlParams.get('linkedin');
+      const imported = urlParams.get('imported');
+      const error = urlParams.get('error');
+      
+      if (error) {
+        const message = urlParams.get('message') || 'LinkedIn import failed';
+        alert('LinkedIn Import Error: ' + message);
+        // Clean URL
+        window.history.replaceState({}, '', '/onboarding.html');
+      }
+      
+      if (linkedInData && imported) {
+        try {
+          // Decode LinkedIn profile data
+          const profile = JSON.parse(atob(linkedInData));
+          console.log('✓ LinkedIn profile loaded:', profile);
+          
+          // Pre-fill form fields
+          prefillFromLinkedIn(profile);
+          
+          // Show success message
+          const successMsg = document.getElementById('linkedInSuccess');
+          const importSection = document.getElementById('linkedInImportSection');
+          
+          if (successMsg) successMsg.style.display = 'block';
+          if (importSection) importSection.style.display = 'none';
+          
+          // Clean URL
+          window.history.replaceState({}, '', '/onboarding.html');
+          
+        } catch (error) {
+          console.error('Error parsing LinkedIn data:', error);
+        }
+      }
+    }
+    
+    function prefillFromLinkedIn(profile) {
+      // Pre-fill name (will be asked in step 6)
+      const displayName = `${profile.firstName} ${profile.lastName}`.trim();
+      if (displayName) {
+        localStorage.setItem('linkedin_displayName', displayName);
+      }
+      
+      // Pre-fill email (step 1)
+      if (profile.email) {
+        // Email isn't in step 1, but we can store it for later
+        localStorage.setItem('linkedin_email', profile.email);
+      }
+      
+      // Pre-fill headline as role (step 1)
+      if (profile.headline) {
+        // Try to extract skills from headline
+        const headline = profile.headline.toLowerCase();
+        const skillKeywords = [
+          'marketing', 'engineer', 'developer', 'designer', 'product', 
+          'manager', 'data', 'analyst', 'growth', 'seo', 'sales'
+        ];
+        
+        // Auto-add skills based on headline
+        const foundSkills = [];
+        skillKeywords.forEach(keyword => {
+          if (headline.includes(keyword)) {
+            foundSkills.push(keyword);
+          }
+        });
+        
+        if (foundSkills.length > 0) {
+          localStorage.setItem('linkedin_skills', JSON.stringify(foundSkills));
+          console.log('✓ Detected skills from headline:', foundSkills);
+        }
+      }
+      
+      // Store full profile for later use
+      localStorage.setItem('linkedin_profile', JSON.stringify(profile));
+      
+      console.log('✓ LinkedIn data stored for pre-filling');
+    }
     
     // Load smart opportunity suggestions based on selected skills
     async function loadSmartOpportunities() {
