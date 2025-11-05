@@ -116,33 +116,46 @@
           const signUpDiv = document.getElementById('clerk-sign-up');
           window.Clerk.mountSignUp(signUpDiv, {
             afterSignUpUrl: '/onboarding',
-          appearance: {
-            elements: {
-              rootBox: { margin: '0 auto' },
-              card: { 
-                boxShadow: 'none',
-                border: '1px solid #E2E8F0'
+            appearance: {
+              elements: {
+                rootBox: { margin: '0 auto' },
+                card: { 
+                  boxShadow: 'none',
+                  border: '1px solid #E2E8F0'
+                }
               }
             }
-          }
-        });
+          });
 
           // Listen for successful sign up
           window.Clerk.addListener(({ session }) => {
-          if (session) {
-            // Create user in Supabase
-            createUserInSupabase(session.user);
-          }
-        });
-      } catch (error) {
-        console.error('Clerk initialization error:', error);
+            if (session) {
+              // Create user in Supabase
+              createUserInSupabase(session.user);
+            }
+          });
+        } catch (error) {
+          console.error('Clerk initialization error:', error);
+          document.getElementById('clerk-sign-up').innerHTML = `
+            <div class="card">
+              <p class="small" style="color: #991b1b;">Error loading authentication. Please check your configuration.</p>
+              <a href="onboarding.html" class="btn gray">Continue in demo mode</a>
+            </div>
+          `;
+        }
+      };
+      
+      script.onerror = (error) => {
+        console.error('Failed to load Clerk script', error);
         document.getElementById('clerk-sign-up').innerHTML = `
           <div class="card">
-            <p class="small" style="color: #991b1b;">Error loading authentication. Please check your configuration.</p>
+            <p class="small" style="color: #991b1b;">Failed to load authentication library.</p>
             <a href="onboarding.html" class="btn gray">Continue in demo mode</a>
           </div>
         `;
-      }
+      };
+      
+      document.head.appendChild(script);
     }
 
     async function createUserInSupabase(clerkUser) {
@@ -169,7 +182,31 @@
       const last = (lastName || '').charAt(0).toUpperCase();
       return first + last || 'U';
     }
+    
+    // Wait for config.js to load before initializing Clerk
+    function waitForConfig() {
+      if (window.opentoConfig && window.opentoConfig.clerk && window.opentoConfig.clerk.publishableKey) {
+        console.log('✅ Config loaded, initializing Clerk...');
+        initClerk();
+      } else {
+        // Check again after a short delay
+        setTimeout(waitForConfig, 50);
+      }
+    }
+    
+    // Load auth-modal.js first, then initialize
+    const authModalScript = document.createElement('script');
+    authModalScript.src = 'lib/auth-modal.js';
+    authModalScript.onload = () => {
+      console.log('Auth modal script loaded');
+      // Start checking for config after auth modal is loaded
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', waitForConfig);
+      } else {
+        waitForConfig();
+      }
+    };
+    document.head.appendChild(authModalScript);
   </script>
-  <script src="lib/auth-modal.js"></script>
 </body>
 </html>

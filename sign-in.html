@@ -56,18 +56,8 @@
       
       if (!publishableKey) {
         console.error('❌ Clerk publishable key not found in config');
-        document.getElementById('clerk-sign-in').innerHTML = `
-          <div class="card">
-            <h3>Configuration Required</h3>
-            <p class="small">Please configure Clerk in <code>config.js</code></p>
-            <ol class="small">
-              <li>Create a Clerk account at <a href="https://clerk.dev" target="_blank">clerk.dev</a></li>
-              <li>Copy your publishable key</li>
-              <li>Update <code>config.js</code> with your key</li>
-            </ol>
-            <a href="inbox.html" class="btn">Continue in demo mode</a>
-          </div>
-        `;
+        // Don't show error message, just leave empty
+        console.log('Clerk not configured');
         return;
       }
 
@@ -136,26 +126,14 @@
             clerkAvailable: !!window.Clerk,
             configAvailable: !!window.opentoConfig
           });
-          document.getElementById('clerk-sign-in').innerHTML = `
-            <div class="card">
-              <p class="small" style="color: #991b1b;">Error loading authentication. Please check your configuration.</p>
-              <p class="small" style="color: #991b1b; margin-top: 8px;">Error: ${error.message || 'Unknown error'}</p>
-              <p class="small" style="color: #666; margin-top: 8px;">Check browser console for details.</p>
-              <a href="inbox.html" class="btn gray">Continue in demo mode</a>
-            </div>
-          `;
+                // Don't show error in UI, just log it
+                console.error('Authentication error details:', error);
         }
       };
       
       script.onerror = (error) => {
         console.error('❌ Failed to load Clerk script from CDN', error);
-        document.getElementById('clerk-sign-in').innerHTML = `
-          <div class="card">
-            <p class="small" style="color: #991b1b;">Failed to load Clerk authentication library.</p>
-            <p class="small" style="color: #666; margin-top: 8px;">Check if accounts.clerk.dev is accessible.</p>
-            <a href="inbox.html" class="btn gray">Continue in demo mode</a>
-          </div>
-        `;
+        // Don't show error in UI
       };
       
       document.head.appendChild(script);
@@ -177,13 +155,7 @@
             clerk: window.opentoConfig?.clerk,
             key: window.opentoConfig?.clerk?.publishableKey
           });
-          document.getElementById('clerk-sign-in').innerHTML = `
-            <div class="card">
-              <p class="small" style="color: #991b1b;">Configuration file failed to load. Please refresh the page.</p>
-              <p class="small" style="color: #666; margin-top: 8px;">Make sure config.js is accessible at: <code>${window.location.origin}/config.js</code></p>
-              <a href="/" class="btn gray">Go home</a>
-            </div>
-          `;
+          // Don't show error in UI
         }
       }
     }
