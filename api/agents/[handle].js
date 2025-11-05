@@ -111,7 +111,7 @@ export default async function handler(req, res) {
       requestIntro: {
         pitch: buildIntroPitch(user),
         guidelines: [
-          'Share the goal or KPI you're trying to achieve',
+          'Share the goal or KPI you are trying to achieve',
           'Summarize your current approach and main blockers',
           'Include decision-maker info and timeline',
           'Mention budget range for consulting or project work'

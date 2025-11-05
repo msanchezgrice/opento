@@ -1032,7 +1032,10 @@ function initializeChat() {
       // Get current agent data
       agent = window.currentAgentData;
       
+      console.log('Opening chat, agent data:', agent);
+      
       if (!agent) {
+        console.error('No agent data available for chat');
         toast('Error: Agent data not loaded. Please refresh the page.');
         return;
       }
@@ -1040,6 +1043,8 @@ function initializeChat() {
       const agentName = agent.display_name || agent.displayName || 'Agent';
       const firstName = agentName.split(' ')[0];
       setText('#displayNameChat', firstName);
+      
+      console.log(`✓ Chat opened for ${firstName}`);
       
       chatModal.style.display='flex';
       track('Chat Opened');
@@ -1090,6 +1095,8 @@ function initializeChat() {
 
     const showQuickReplies = ()=> {
       chatSuggestions.innerHTML = '';
+      const agentName = agent ? (agent.display_name || agent.displayName || 'Agent') : 'Agent';
+      const firstName = agentName.split(' ')[0];
       const suggestions = [
         'What are the rates?',
         `What is ${firstName} available for?`,
