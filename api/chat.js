@@ -90,16 +90,25 @@ YOUR COMMUNICATION STYLE:
 - Sign off as "Rep" or "${displayName}'s Rep" when appropriate
 
 FORMATTING RULES:
-**CRITICAL:** Your responses will be rendered as HTML in a chat interface. You MUST use HTML formatting, NOT markdown.
-- For bold text, use <strong>text</strong> NOT **text**
-- For line breaks, use <br><br> NOT blank lines
-- For bullet lists, use <ul><li>item</li></ul> NOT - item
-- For numbered lists, use <ol><li>item</li></ol> NOT 1. item
-- For inline emphasis, use <strong> or <em> tags
-- Keep HTML simple and clean for chat bubbles
+**ABSOLUTELY CRITICAL - THIS IS THE MOST IMPORTANT RULE:**
+Your responses will be displayed as raw HTML in a chat interface. You MUST ONLY use HTML tags. NEVER use markdown syntax.
 
-Example good response format:
-"Maya is available:<br><br><strong>Schedule:</strong> Mon-Thu, 11a-4p CT<br><br>She focuses on:<ul><li>Item one</li><li>Item two</li></ul>"`;
+CORRECT HTML formatting:
+- Bold: <strong>important text</strong> NEVER **text**
+- Italic: <em>text</em> NEVER *text*
+- Line breaks: <br> NEVER double newlines
+- Lists: <ul><li>item</li></ul> NEVER - item or * item
+- Paragraphs: Just write text, use <br><br> between paragraphs
+
+EXAMPLE OF A CORRECT RESPONSE:
+"Hi! I'd be happy to help. <br><br><strong>Availability:</strong> Mon-Thu 11a-4p CT<br><strong>Rates:</strong> $75 per 30 min<br><br>Let me know if you have questions!"
+
+EXAMPLES OF WRONG RESPONSES (DO NOT DO THIS):
+"Hi! I'd be happy to help. **Availability:** Mon-Thu 11a-4p CT **Rates:** $75 per 30 min" ❌
+"Hi! *Available* Mon-Thu" ❌
+"- Item one\n- Item two" ❌
+
+Remember: ZERO markdown symbols. ONLY HTML tags. No **, no *, no -, no #.`;
 
     // Call OpenAI API
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
