@@ -19,7 +19,24 @@
         <div class="chip">Managed $3.2M/yr spend</div>
         <div class="chip">Prefers async brief first</div>
       </div>
-      <div><a class="btn" href="recipes.html">Recipes</a></div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <a class="btn" href="recipes.html">Recipes</a>
+        <div class="account-menu" style="position: relative;">
+          <button class="btn ghost" id="accountBtn" style="padding: 8px 12px; min-width: auto;">
+            <span style="font-size: 18px;">⚙️</span>
+          </button>
+          <div id="accountDropdown" class="account-dropdown" style="display: none; position: absolute; right: 0; top: calc(100% + 8px); background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 8px; min-width: 200px; box-shadow: var(--shadow-2); z-index: 100;">
+            <a href="https://accounts.opento.co/user" class="account-item" style="display: block; padding: 12px; border-radius: 8px; color: var(--text); text-decoration: none; transition: background 0.2s;">
+              <div style="font-weight: 600; margin-bottom: 4px;">Account Settings</div>
+              <div class="small">Manage your profile and preferences</div>
+            </a>
+            <div style="height: 1px; background: var(--border); margin: 8px 0;"></div>
+            <a href="https://accounts.opento.co/sign-out" class="account-item" style="display: block; padding: 12px; border-radius: 8px; color: var(--danger); text-decoration: none; transition: background 0.2s;">
+              <div style="font-weight: 600;">Sign Out</div>
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -170,5 +187,32 @@
 
   <script src="script.js"></script>
   <script src="lib/inbox-integration.js"></script>
+  <script>
+    // Account menu toggle
+    const accountBtn = document.getElementById('accountBtn');
+    const accountDropdown = document.getElementById('accountDropdown');
+    
+    accountBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      accountDropdown.style.display = accountDropdown.style.display === 'none' ? 'block' : 'none';
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!accountBtn.contains(e.target) && !accountDropdown.contains(e.target)) {
+        accountDropdown.style.display = 'none';
+      }
+    });
+    
+    // Add hover effects
+    document.querySelectorAll('.account-item').forEach(item => {
+      item.addEventListener('mouseenter', function() {
+        this.style.background = 'var(--soft)';
+      });
+      item.addEventListener('mouseleave', function() {
+        this.style.background = 'transparent';
+      });
+    });
+  </script>
 </body>
 </html>
