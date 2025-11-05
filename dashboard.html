@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>My Dashboard — Opento</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="lib/supabase-client.js"></script>
+  <script src="lib/session.js"></script>
+</head>
+<body>
+  <div class="app-nav">
+    <div class="container">
+      <div class="brand"><img class="brand-logo" src="assets/logo.svg" alt=""><div class="brand-name">Opento</div></div>
+      <div class="chips">
+        <div class="chip">Dashboard</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <a class="btn gray" id="viewProfileBtn" href="#" target="_blank">View Public Profile</a>
+        <button class="btn ghost" onclick="if(confirm('Sign out?')) { signOut(); window.location.href='/'; }" style="padding: 8px 12px;">Sign Out</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container section" style="max-width: 1200px; margin-top: 40px;">
+    <!-- Loading state -->
+    <div id="dashboardLoading" style="text-align: center; padding: 60px 20px;">
+      <div class="small">Loading your dashboard...</div>
+    </div>
+
+    <!-- Main dashboard content (hidden until loaded) -->
+    <div id="dashboardContent" style="display: none;">
+      <!-- Header with agent info -->
+      <div class="card" style="margin-bottom: 32px;">
+        <div style="display: flex; align-items: center; gap: 20px;">
+          <div class="handle-avatar" id="dashAvatar" style="width: 80px; height: 80px; font-size: 32px;">—</div>
+          <div style="flex: 1;">
+            <h1 id="dashName" style="margin: 0 0 8px 0;">Your Agent</h1>
+            <div class="small" style="color: #64748b;">@<span id="dashHandle">—</span></div>
+            <div style="margin-top: 12px;">
+              <a id="viewPublicProfile" href="#" target="_blank" class="btn small">View Public Profile</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab navigation -->
+      <div class="card" style="margin-bottom: 24px;">
+        <div style="display: flex; gap: 16px; border-bottom: 1px solid var(--border); padding-bottom: 0;">
+          <button class="tab-btn active" data-tab="profile" style="padding: 12px 16px; border: none; background: none; cursor: pointer; border-bottom: 2px solid var(--primary); font-weight: 600; color: var(--primary);">Profile</button>
+          <button class="tab-btn" data-tab="settings" style="padding: 12px 16px; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500; color: var(--muted);">Settings</button>
+          <button class="tab-btn" data-tab="skills" style="padding: 12px 16px; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500; color: var(--muted);">Skills</button>
+          <button class="tab-btn" data-tab="intros" style="padding: 12px 16px; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500; color: var(--muted);">Intro Requests</button>
+        </div>
+      </div>
+
+      <!-- Profile Tab -->
+      <div class="tab-content" data-tab="profile">
+        <div class="card">
+          <h2>Profile Information</h2>
+          <p class="small" style="color: #64748b; margin-bottom: 24px;">This information appears on your public agent page.</p>
+          
+          <form id="profileForm" style="display: grid; gap: 20px;">
+            <label class="input">
+              <span>Display Name *</span>
+              <input type="text" id="profileName" required placeholder="Your full name">
+            </label>
+            
+            <label class="input">
+              <span>Role / Title *</span>
+              <input type="text" id="profileRole" required placeholder="e.g., Performance Marketer">
+            </label>
+            
+            <label class="input">
+              <span>Bio / Summary</span>
+              <textarea id="profileSummary" rows="4" placeholder="A brief description of your expertise and background"></textarea>
+            </label>
+            
+            <label class="input">
+              <span>Location</span>
+              <input type="text" id="profileLocation" placeholder="e.g., Austin, TX">
+            </label>
+            
+            <label class="input">
+              <span>Email</span>
+              <input type="email" id="profileEmail" placeholder="your@email.com">
+              <div class="small muted">For notifications (not shown publicly)</div>
+            </label>
+            
+            <div>
+              <button type="submit" class="btn primary">Save Profile</button>
+              <button type="button" class="btn gray" onclick="window.location.reload()" style="margin-left: 12px;">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Settings Tab -->
+      <div class="tab-content" data-tab="settings" style="display: none;">
+        <div class="card">
+          <h2>Agent Settings</h2>
+          <p class="small" style="color: #64748b; margin-bottom: 24px;">Configure your rates, availability, and work preferences.</p>
+          
+          <form id="settingsForm" style="display: grid; gap: 20px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <label class="input">
+                <span>Consult rate (per 30 min)</span>
+                <input type="number" id="settingsConsultFloor" min="0" step="5" placeholder="75">
+                <div class="small muted">Minimum for 30-minute calls</div>
+              </label>
+              
+              <label class="input">
+                <span>Async task rate (per 5 min)</span>
+                <input type="number" id="settingsAsyncFloor" min="0" step="1" placeholder="12">
+                <div class="small muted">Minimum for quick tasks</div>
+              </label>
+            </div>
+            
+            <label class="input">
+              <span>Weekly hours target</span>
+              <input type="range" id="settingsHours" min="0" max="20" value="6">
+              <span id="settingsHoursVal" class="chip">6 hrs / week</span>
+            </label>
+            
+            <label class="input">
+              <span>Availability window</span>
+              <select id="settingsWindow">
+                <option>Mon–Thu 11a–4p CT</option>
+                <option>Mon–Fri 9a–5p ET</option>
+                <option>Mon–Fri Lunch hours</option>
+                <option>Tue & Thu Evenings</option>
+                <option>Weekends only</option>
+                <option>Flexible / By appointment</option>
+              </select>
+            </label>
+            
+            <div>
+              <h3 style="margin-bottom: 16px;">Work Categories</h3>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px;" id="categoriesContainer">
+                <label style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer;">
+                  <input type="checkbox" name="category" value="Growth audits">
+                  <span>Growth audits & consults</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer;">
+                  <input type="checkbox" name="category" value="Campaign optimization">
+                  <span>Campaign optimization</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer;">
+                  <input type="checkbox" name="category" value="Fractional retainers">
+                  <span>Fractional retainers</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer;">
+                  <input type="checkbox" name="category" value="Data labeling">
+                  <span>Data labeling & QA</span>
+                </label>
+              </div>
+            </div>
+            
+            <div>
+              <h3 style="margin-bottom: 16px;">Privacy Settings</h3>
+              <label style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer;">
+                <input type="checkbox" id="settingsAnonFirst" checked>
+                <div>
+                  <div style="font-weight: 600;">Anonymous first</div>
+                  <div class="small muted">Identity reveals only after accept + escrow</div>
+                </div>
+              </label>
+              <label style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; margin-top: 12px;">
+                <input type="checkbox" id="settingsConsentReminders" checked>
+                <div>
+                  <div style="font-weight: 600;">Consent reminders</div>
+                  <div class="small muted">Show what's shared before each accept</div>
+                </div>
+              </label>
+            </div>
+            
+            <div>
+              <button type="submit" class="btn primary">Save Settings</button>
+              <button type="button" class="btn gray" onclick="window.location.reload()" style="margin-left: 12px;">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Skills Tab -->
+      <div class="tab-content" data-tab="skills" style="display: none;">
+        <div class="card">
+          <h2>Your Skills</h2>
+          <p class="small" style="color: #64748b; margin-bottom: 24px;">Manage the skills shown on your agent profile.</p>
+          
+          <div style="margin-bottom: 24px;">
+            <h3 style="margin-bottom: 12px;">Current Skills</h3>
+            <div id="currentSkills" class="chips" style="min-height: 48px;">
+              <div class="chip">Loading...</div>
+            </div>
+          </div>
+          
+          <form id="skillsForm">
+            <label class="input">
+              <span>Add Skills</span>
+              <input type="text" id="skillsInput" placeholder="Type skill and press Enter" list="skillsList" autocomplete="off">
+              <div class="small muted">Type and press Enter or comma to add. Click X on chips to remove.</div>
+            </label>
+            
+            <datalist id="skillsList">
+              <option>performance marketing</option>
+              <option>paid social</option>
+              <option>seo</option>
+              <option>growth marketing</option>
+              <option>product management</option>
+              <option>design</option>
+              <option>engineering</option>
+              <option>data analysis</option>
+            </datalist>
+            
+            <div style="margin-top: 20px;">
+              <button type="submit" class="btn primary">Save Skills</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Intro Requests Tab -->
+      <div class="tab-content" data-tab="intros" style="display: none;">
+        <div class="card">
+          <h2>Intro Requests</h2>
+          <p class="small" style="color: #64748b; margin-bottom: 24px;">People who want to connect with you.</p>
+          
+          <div id="introsLoading" style="text-align: center; padding: 40px;">
+            <div class="small">Loading requests...</div>
+          </div>
+          
+          <div id="introsList" style="display: none;"></div>
+          
+          <div id="introsEmpty" style="display: none; text-align: center; padding: 40px;">
+            <h3>No intro requests yet</h3>
+            <p class="small">When someone requests an intro through your agent page, it will appear here.</p>
+            <div style="margin-top: 20px;">
+              <a href="#" id="shareProfileLink" class="btn">Share Your Profile</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="lib/dashboard-integration.js"></script>
+  <script src="lib/nav-helper.js"></script>
+</body>
+</html>
