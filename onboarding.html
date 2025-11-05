@@ -59,10 +59,19 @@
             </label>
             <label class="input" style="grid-column: 1 / -1;">
               <span>Your skills</span>
-              <input id="skillsInput" type="text" list="skillsList" placeholder="Start typing to add skills..." autocomplete="off">
-              <input id="skills" type="hidden" required>
+              <div class="skills-selector">
+                <input id="skillsInput" type="text" placeholder="Start typing to search skills..." autocomplete="off">
+                <input id="skills" type="hidden" required>
+                
+                <!-- Custom dropdown (hidden by default) -->
+                <div id="skillsDropdown" class="skills-dropdown" style="display: none;">
+                  <div class="skills-dropdown-loading">Loading skills...</div>
+                </div>
+              </div>
+              
+              <!-- Selected skills shown as chips -->
               <div id="skillsChips" class="skills-chips" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; min-height: 32px;"></div>
-              <div class="small muted">Type and press Enter or comma to add skills. Click X to remove.</div>
+              <div class="small muted">Start typing to search, click to add. Click X on chips to remove.</div>
             </label>
           </div>
           <datalist id="locList">
@@ -78,26 +87,6 @@
             <option>Berlin, DE</option>
             <option>Toronto, ON</option>
             <option>Remote</option>
-          </datalist>
-          <datalist id="skillsList">
-            <option>performance marketing</option>
-            <option>paid social</option>
-            <option>lifecycle</option>
-            <option>email marketing</option>
-            <option>seo</option>
-            <option>sem</option>
-            <option>content</option>
-            <option>product management</option>
-            <option>growth</option>
-            <option>user research</option>
-            <option>design</option>
-            <option>data analysis</option>
-            <option>ai</option>
-            <option>engineering</option>
-            <option>copywriting</option>
-            <option>sales</option>
-            <option>consulting</option>
-            <option>qa</option>
           </datalist>
           <div class="step-actions">
             <button class="btn primary" data-next>Continue</button>
@@ -317,6 +306,15 @@
   </div>
 
   <script src="script.js"></script>
+  <script src="lib/skills-selector.js"></script>
   <script src="lib/onboarding-integration.js"></script>
+  <script>
+    // Initialize skills selector when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.initializeSkillsSelector) {
+        window.initializeSkillsSelector();
+      }
+    });
+  </script>
 </body>
 </html>

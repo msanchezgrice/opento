@@ -313,6 +313,94 @@ small, .small { color: var(--muted); }
 .preview-content { display:grid; gap:16px; }
 .preview-card-small { background:#f8faff; border:1px solid #dfe6ff; border-radius:12px; padding:16px; }
 .preview-card-small .muted { display:block; margin-bottom:8px; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; }
+
+/* Skills Selector - Enhanced autocomplete dropdown */
+.skills-selector { position: relative; width: 100%; }
+.skills-selector input[type="text"] { width: 100%; box-sizing: border-box; }
+.skills-dropdown { 
+  position: absolute; 
+  top: 100%; 
+  left: 0; 
+  right: 0; 
+  background: var(--card); 
+  border: 2px solid var(--primary); 
+  border-radius: 12px; 
+  margin-top: 4px; 
+  max-height: 320px; 
+  overflow-y: auto; 
+  box-shadow: 0 12px 28px rgba(45,111,255,0.2); 
+  z-index: 100;
+}
+.skills-dropdown-loading { 
+  padding: 20px; 
+  text-align: center; 
+  color: var(--muted); 
+  font-size: 14px; 
+}
+.skills-category { border-bottom: 1px solid var(--border); }
+.skills-category:last-child { border-bottom: none; }
+.skills-category-name { 
+  padding: 10px 14px 8px; 
+  font-weight: 700; 
+  font-size: 11px; 
+  text-transform: uppercase; 
+  letter-spacing: 0.06em; 
+  color: var(--muted); 
+  background: #f8fafc; 
+  position: sticky; 
+  top: 0; 
+  z-index: 1;
+}
+.skills-option { 
+  padding: 10px 14px; 
+  cursor: pointer; 
+  transition: background .15s ease; 
+  font-size: 15px;
+}
+.skills-option:hover, .skills-option.highlighted { 
+  background: #f0f9ff; 
+  color: var(--primary); 
+}
+.skills-option.disabled { 
+  opacity: 0.5; 
+  cursor: not-allowed; 
+  background: #fafafa;
+}
+.skills-option.disabled:hover { 
+  background: #fafafa; 
+  color: var(--text);
+}
+
+/* Skills chips - selected skills */
+.skills-chips { display: flex; flex-wrap: wrap; gap: 8px; min-height: 40px; }
+.skill-chip { 
+  display: inline-flex; 
+  align-items: center; 
+  gap: 6px; 
+  background: var(--chip); 
+  color: var(--chip-text); 
+  padding: 6px 10px 6px 12px; 
+  border-radius: 8px; 
+  font-size: 14px; 
+  font-weight: 600;
+  border: 1px solid rgba(45,111,255,0.2);
+}
+.skill-chip-remove { 
+  background: none; 
+  border: none; 
+  cursor: pointer; 
+  padding: 0 2px; 
+  margin: 0; 
+  color: var(--chip-text); 
+  font-size: 18px; 
+  line-height: 1; 
+  font-weight: bold; 
+  opacity: 0.7; 
+  transition: opacity .2s ease;
+}
+.skill-chip-remove:hover { 
+  opacity: 1; 
+}
 .preview-value { font-weight:700; font-size:15px; margin-bottom:4px; color:var(--text); }
 .preview-chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
 .preview-chips .chip.small { font-size:11px; padding:4px 8px; }
