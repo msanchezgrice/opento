@@ -976,46 +976,18 @@ function drawShareCard(canvas, val){
 
 function handlePageInit(){
   if(!document.body.classList.contains('handle-page')) return;
-  const params = new URLSearchParams(location.search);
-  const handle = params.get('u') || demoAgent.handle;
-  document.title = `Opento — ${demoAgent.displayName} (@${handle})`;
-  setText('#displayName', demoAgent.displayName);
-  setText('#displayNameModal', demoAgent.displayName);
-  setText('#handleName', handle);
-  setText('#handleRole', demoAgent.role);
-  setText('#handleSummary', demoAgent.summary);
-  setText('#handleLocation', demoAgent.location);
-  setText('#rulesSummary', demoAgent.rulesSummary);
-  setText('#availability', demoAgent.availability);
-  const linkedinLink = qs('#linkedinLink');
-  if(linkedinLink && demoAgent.linkedinUrl){
-    linkedinLink.href = demoAgent.linkedinUrl;
-  }
-  const avatar = qs('#handleAvatar'); if(avatar) avatar.textContent = demoAgent.avatar;
-  const proofHolder = qs('#proofList'); if(proofHolder) proofHolder.innerHTML = demoAgent.socialProof.map(p=>`<div class="chip">${p}</div>`).join('');
-  const focusList = qs('#focusList'); if(focusList) focusList.innerHTML = demoAgent.focusAreas.map(item=>`<li>${item}</li>`).join('');
-  const openList = qs('#openToList'); if(openList) openList.innerHTML = demoAgent.openTo.map(item=>`<li>${item}</li>`).join('');
-  const winList = qs('#winList'); if(winList) winList.innerHTML = demoAgent.recentWins.map(item=>`<li>${item}</li>`).join('');
-  const guidelines = qs('#introGuidelines'); if(guidelines) guidelines.innerHTML = demoAgent.requestIntro.guidelines.map(item=>`<li>${item}</li>`).join('');
-  setText('#introPitch', demoAgent.requestIntro.pitch);
-  setText('#introNote', demoAgent.requestIntro.note);
-  setText('#introTemplatePreview', demoAgent.requestIntro.template);
-  const shareLink = qs('#handleShareLink'); if(shareLink) shareLink.href = `share.html?handle=${handle}`;
-
-  // Initialize cycling "open to" text
-  const firstName = demoAgent.displayName.split(' ')[0];
-  setText('#handleNameInline', firstName);
-  const typewriterHandle = qs('.typewriter-handle');
-  if(typewriterHandle) {
-    typeWriter(typewriterHandle, demoAgent.openTo, 55, 1300);
-  }
+  
+  // NOTE: Agent data is now loaded by handle-integration.js
+  // This function only handles modal interactions
+  console.log('Handle page: Initializing modal interactions...');
 
   const modal = qs('#introModal');
   const openBtn = qs('#requestIntro');
   const templateBtn = qs('#copyIntroTemplate');
   if(templateBtn){
     templateBtn.addEventListener('click', ()=>{
-      navigator.clipboard.writeText(demoAgent.requestIntro.template)
+      const template = qs('#introTemplatePreview')?.textContent || '';
+      navigator.clipboard.writeText(template)
         .then(()=> toast('Template copied'))
         .catch(()=> toast('Unable to copy template', 2600));
     });
@@ -1026,33 +998,20 @@ function handlePageInit(){
     openBtn.addEventListener('click', open);
     modal.addEventListener('click', (e)=>{ if(e.target===modal) close(); });
     qsa('[data-close="intro"]', modal).forEach(btn=> btn.addEventListener('click', close));
-    const form = qs('#introForm');
-    form?.addEventListener('submit', (e)=>{
-      e.preventDefault();
-      const fd = new FormData(form);
-      const payload = {
-        name: (fd.get('name')||'').toString().trim(),
-        email: (fd.get('email')||'').toString().trim(),
-        company: (fd.get('company')||'').toString().trim(),
-        notes: (fd.get('notes')||'').toString().trim(),
-        ts: new Date().toISOString()
-      };
-      const k='opento_intro_requests';
-      const list=JSON.parse(localStorage.getItem(k)||'[]'); list.push(payload); localStorage.setItem(k, JSON.stringify(list));
-      track('Intro Request Drafted', {hasNotes: !!payload.notes, company: payload.company});
-      toast('Intro request drafted. Rep replies within ~1 business day.');
-      form.reset();
-      close();
-    });
+    // Form submission is now handled by handle-integration.js
   }
 
-  // Chat functionality
+  // Chat functionality - only initialize if we're on handle page
   const chatModal = qs('#chatModal');
   const chatBtn = qs('#chatWithRep');
   const chatMessages = qs('#chatMessages');
   const chatInput = qs('#chatInput');
   const chatSend = qs('#chatSend');
   const chatSuggestions = qs('#chatSuggestions');
+
+  // Skip chat init if not on handle page
+  const isHandlePage = document.body.classList.contains('handle-page');
+  if(!isHandlePage) return;
 
   if(chatModal && chatBtn){
     // Get agent data when chat is opened
