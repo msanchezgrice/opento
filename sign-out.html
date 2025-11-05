@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Signing Out — Opento</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
+</head>
+<body>
+  <div class="container section" style="max-width: 480px; margin: 60px auto; text-align:center;">
+    <h2>Signing out...</h2>
+    <p class="lead">Please wait while we sign you out.</p>
+  </div>
+
+  <script>
+    (async function signOut() {
+      try {
+        // Load Clerk SDK
+        const script = document.createElement('script');
+        script.src = 'https://accounts.clerk.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
+        script.setAttribute('data-clerk-publishable-key', window.opentoConfig?.clerk?.publishableKey || 'pk_live_Y2xlcmsub3BlbnRvLmNvJA');
+        script.async = true;
+        
+        await new Promise((resolve, reject) => {
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+
+        // Wait for Clerk to be available
+        let attempts = 0;
+        while (!window.Clerk && attempts < 100) {
+          await new Promise(resolve => setTimeout(resolve, 50));
+          attempts++;
+        }
+
+        if (window.Clerk) {
+          // Sign out using Clerk
+          await window.Clerk.load();
+          await window.Clerk.signOut();
+        }
+      } catch (error) {
+        console.error('Sign out error:', error);
+      } finally {
+        // Always redirect to home page
+        window.location.href = 'https://opento.co';
+      }
+    })();
+  </script>
+</body>
+</html>
+
