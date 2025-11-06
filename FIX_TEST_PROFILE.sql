@@ -37,8 +37,7 @@ SELECT
   ap.professional_title,
   ap.bio,
   ap.best_at,
-  ap.experience_highlights,
-  ap.skills
+  ap.experience_highlights
 FROM agent_profiles ap
 JOIN users u ON ap.user_id = u.id
 WHERE u.handle = 'test-12';
