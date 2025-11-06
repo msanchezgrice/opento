@@ -632,15 +632,23 @@
       
       if (note) note.textContent = '';
       
+      // Get seniority to customize options
+      const seniority = document.getElementById('seniorityLevel')?.value;
+      const isExecOrLead = seniority === 'Executive' || seniority === 'Lead';
+      
       const genericOps = [
         'Consulting calls',
         'Advisory sessions',
         'Strategy workshops',
         'Expert review & feedback',
         'Training sessions',
-        'Fractional retainers',
+        'Fractional retainers (10-20 hrs/week)',
+        'Full-time contract work',
         'Project-based work',
-        'Code review'
+        'Code review',
+        'Async sprint work',
+        isExecOrLead ? 'Executive advisory' : 'Skill-building projects',
+        'Research & analysis'
       ];
       
       renderOpportunities(genericOps);
