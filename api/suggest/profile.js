@@ -44,8 +44,17 @@ export default async function handler(req, res) {
   if (field === 'best_at' || field === 'highlights') {
     try {
       suggestion = JSON.parse(suggestion);
+      // Ensure it's an array
+      if (!Array.isArray(suggestion)) {
+        suggestion = [suggestion];
+      }
     } catch (e) {
-      suggestion = suggestion.split('\n').filter(l => l.trim()).slice(0, 3);
+      // If JSON parse fails, split by lines and clean up
+      suggestion = suggestion
+        .split('\n')
+        .map(line => line.replace(/^[-•*\d.)\]]\s*/, '').trim()) // Remove bullets, numbers
+        .filter(line => line.length > 0 && !line.startsWith('[') && !line.startsWith('{'))
+        .slice(0, 3);
     }
   }
 
