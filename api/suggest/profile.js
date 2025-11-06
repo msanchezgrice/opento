@@ -22,9 +22,9 @@ export default async function handler(req, res) {
   } else if (field === 'bio') {
     prompt = `Write 2-3 sentence bio in first person for: ${seniority}, ${years}y, skills: ${skills.join(', ')}, industries: ${industries.join(', ')}${company ? `, at ${company}` : ''}. Focus on value delivered. Under 60 words. Return only bio text.`;
   } else if (field === 'best_at') {
-    prompt = `3 specific strengths for: ${seniority}, skills: ${skills.join(', ')}. Each 5-10 words, action-oriented, measurable. Return JSON array: ["str1","str2","str3"]`;
+    prompt = `List 3 specific professional strengths for: ${seniority}, skills: ${skills.join(', ')}. Each should be 5-10 words, action-oriented, measurable. Return ONLY 3 lines, one per line, no bullets, no numbers, no JSON.`;
   } else if (field === 'highlights') {
-    prompt = `3 achievement highlights for: ${seniority}, ${years}y, ${skills.slice(0,3).join(', ')}${company ? `, ${company}` : ''}. Include metrics. Each 8-15 words. Return JSON array: ["h1","h2","h3"]`;
+    prompt = `List 3 achievement highlights for: ${seniority}, ${years}y experience, ${skills.slice(0,3).join(', ')}${company ? `, at ${company}` : ''}. Include metrics. Each 8-15 words. Return ONLY 3 lines, one per line, no bullets, no numbers, no JSON.`;
   }
 
   const resp = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -42,20 +42,21 @@ export default async function handler(req, res) {
   let suggestion = data.choices[0].message.content.trim();
 
   if (field === 'best_at' || field === 'highlights') {
-    try {
-      suggestion = JSON.parse(suggestion);
-      // Ensure it's an array
-      if (!Array.isArray(suggestion)) {
-        suggestion = [suggestion];
-      }
-    } catch (e) {
-      // If JSON parse fails, split by lines and clean up
-      suggestion = suggestion
-        .split('\n')
-        .map(line => line.replace(/^[-•*\d.)\]]\s*/, '').trim()) // Remove bullets, numbers
-        .filter(line => line.length > 0 && !line.startsWith('[') && !line.startsWith('{'))
-        .slice(0, 3);
-    }
+    // Always parse as newline-separated text
+    suggestion = suggestion
+      .split('\n')
+      .map(line => line
+        .replace(/^[-•*\d.)\]}\["\s]+/, '') // Remove bullets, numbers, brackets, quotes at start
+        .replace(/["\]}\[,]+$/, '') // Remove quotes, brackets at end
+        .trim()
+      )
+      .filter(line => 
+        line.length > 0 && 
+        !line.startsWith('[') && 
+        !line.startsWith('{') &&
+        !line.match(/^["'\[\{]/)
+      )
+      .slice(0, 3);
   }
 
   return res.status(200).json({ success: true, suggestion, field });
