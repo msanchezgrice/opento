@@ -243,7 +243,11 @@ function testDriveInit(){
 /* ---------- Onboarding ---------- */
 function calculateEarningsEstimate(){
   // Get all form values
-  const years = Number(qs('#years')?.value || 6);
+  const seniorityLevel = qs('#seniorityLevel')?.value || 'Senior';
+  // Derive years from seniority
+  const yearsMap = { 'Junior': 2, 'Mid': 4, 'Senior': 8, 'Lead': 12, 'Executive': 18 };
+  const years = yearsMap[seniorityLevel] || 6;
+  
   const location = (qs('#location')?.value || '').toLowerCase();
   const skills = (qs('#skills')?.value || '').toLowerCase();
   const hasLinkedIn = !!(qs('#linkedin')?.value || '').trim();
@@ -355,7 +359,7 @@ function updateOnboardingPreview(currentStep){
     }
   }
 
-  // Update earnings estimate - hide until step 6 (all steps complete)
+  // Update earnings estimate - show from step 3 onward
   const estimate = calculateEarningsEstimate();
   const estNode = qs('#previewEstimate');
   const estNodeInStep = qs('#earningsEstimate');
@@ -363,7 +367,7 @@ function updateOnboardingPreview(currentStep){
 
   // Show/hide estimate card based on current step
   if(estCard){
-    if(currentStep < 6){
+    if(currentStep < 3){
       estCard.style.display = 'none';
     } else {
       estCard.style.display = 'block';
@@ -385,11 +389,11 @@ function updateOnboardingPreview(currentStep){
     node.dataset.val = String(estimate);
   };
 
-  // Only animate if on step 6 or later
-  if(currentStep >= 6){
+  // Animate if on step 3 or later
+  if(currentStep >= 3){
     animateValue(estNode);
+    animateValue(estNodeInStep);
   }
-  animateValue(estNodeInStep);
 }
 
 function bindSwitches(){
