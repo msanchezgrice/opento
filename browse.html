@@ -126,6 +126,11 @@
       const earnings = profile.lifetime_earned || 0;
       const gigs = profile.total_gigs_completed || 0;
       
+      // Use professional_title from profile, fallback to role
+      const title = profile.professional_title || agent.role || 'Professional';
+      const bio = profile.bio || agent.summary || 'Building their presence on Opento';
+      const seniorityLevel = profile.seniority_level;
+      
       return `
         <div class="card" style="display: flex; flex-direction: column; gap: 12px;">
           <div style="display: flex; gap: 12px; align-items: start;">
@@ -138,10 +143,14 @@
             <div style="flex: 1;">
               <strong>${agent.display_name || 'Anonymous'}</strong>
               <div class="small" style="color: #64748B;">@${agent.handle}</div>
+              ${seniorityLevel ? `<div class="chip" style="display: inline-block; margin-top: 4px; font-size: 11px;">${seniorityLevel}</div>` : ''}
             </div>
           </div>
           
-          <p class="small">${agent.summary || agent.role || 'No bio available'}</p>
+          <div>
+            <div class="small" style="font-weight: 600; color: var(--text); margin-bottom: 4px;">${title}</div>
+            <p class="small" style="color: #64748B; margin: 0;">${bio}</p>
+          </div>
           
           ${topSkills.length > 0 ? `
             <div class="chips">

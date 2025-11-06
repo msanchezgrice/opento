@@ -48,8 +48,8 @@ small, .small { color: var(--muted); }
 .brand { display:flex; align-items:center; gap:10px; }
 .brand-logo { width:28px; height:28px; }
 .brand-name { font-weight:800; letter-spacing:0.2px; }
-.nav .btn { background:#ffffff12; border:1px solid #ffffff35; }
-.nav .btn.primary { background: var(--primary); border-color: transparent; }
+.nav .btn { background:#ffffff12; border:1px solid #ffffff35; color: #0f172a; }
+.nav .btn.primary { background: var(--primary); border-color: transparent; color: #fff; }
 /* Mobile nav */
 .menu-toggle { display:none; background:transparent; border:1px solid #ffffff35; color:#fff; padding:8px 10px; border-radius:8px; font-weight:700; }
 .actions { display:flex; align-items:center; gap:8px; }
