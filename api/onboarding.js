@@ -150,6 +150,11 @@ export default async function handler(req, res) {
         current_company: currentCompany,
         years_in_role: yearsInRole,
         industries: industries,
+        // Profile story fields (user-authored)
+        professional_title: profileData.professionalTitle,
+        bio: profileData.bio,
+        best_at: profileData.bestAt || [],
+        experience_highlights: profileData.experienceHighlights || [],
         // Generated fields
         open_to: openTo,
         focus_areas: focusAreas,
