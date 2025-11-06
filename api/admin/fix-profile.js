@@ -53,8 +53,8 @@ export default async function handler(req, res) {
       });
     }
 
-    // Create profile
-    const { data: profile, error: profileError } = await supabase
+    // Create profile (no select to avoid schema issues)
+    const { error: profileError } = await supabase
       .from('agent_profiles')
       .insert({
         user_id: user.id,
@@ -77,8 +77,7 @@ export default async function handler(req, res) {
         lifetime_earned: 0,
         last_payout: 0,
         total_gigs_completed: 0
-      })
-      .select('user_id, professional_title, bio');
+      });
 
     if (profileError) {
       console.error('Profile creation error:', profileError);
@@ -89,8 +88,7 @@ export default async function handler(req, res) {
       success: true,
       message: 'Profile created successfully',
       user_id: user.id,
-      handle: user.handle,
-      profile: profile
+      handle: user.handle
     });
 
   } catch (error) {
