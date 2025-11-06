@@ -51,7 +51,13 @@ export default async function handler(req, res) {
       .eq('handle', handle)
       .single();
 
+    // DEBUG: Log what Supabase returned
+    console.log('Supabase query result for', handle, ':');
+    console.log('- agent_profiles:', JSON.stringify(user?.agent_profiles));
+    console.log('- agent_settings:', JSON.stringify(user?.agent_settings));
+
     if (userError || !user) {
+      console.error('User error:', userError);
       return res.status(404).json({ error: 'Agent not found' });
     }
 
