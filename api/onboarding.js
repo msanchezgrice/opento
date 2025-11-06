@@ -139,31 +139,36 @@ export default async function handler(req, res) {
     const focusAreas = generateFocusAreas(skills || [], settings?.categories || []);
     const socialProof = generateSocialProof(profileData || {});
 
-    const { error: profileError } = await supabase
+    const profilePayload = {
+      user_id: userId,
+      location: profileData.location || null,
+      years_experience: profileData.yearsExperience ? parseInt(profileData.yearsExperience) : null,
+      // Enhanced fields
+      seniority_level: seniorityLevel || null,
+      current_company: currentCompany || null,
+      years_in_role: yearsInRole ? parseInt(yearsInRole) : null,
+      industries: industries || [],
+      // Profile story fields (user-authored)
+      professional_title: profileData.professionalTitle || null,
+      bio: profileData.bio || null,
+      best_at: profileData.bestAt || [],
+      experience_highlights: profileData.experienceHighlights || [],
+      // Generated fields
+      open_to: openTo || [],
+      focus_areas: focusAreas || [],
+      recent_wins: [],
+      social_proof: socialProof || [],
+      lifetime_earned: 0,
+      last_payout: 0,
+      total_gigs_completed: 0
+    };
+    
+    console.log('Upserting agent_profiles with payload:', JSON.stringify(profilePayload, null, 2));
+    
+    const { data: profileResult, error: profileError } = await supabase
       .from('agent_profiles')
-      .upsert({
-        user_id: userId,
-        location: profileData.location,
-        years_experience: profileData.yearsExperience ? parseInt(profileData.yearsExperience) : null,
-        // Enhanced fields
-        seniority_level: seniorityLevel,
-        current_company: currentCompany,
-        years_in_role: yearsInRole,
-        industries: industries,
-        // Profile story fields (user-authored)
-        professional_title: profileData.professionalTitle,
-        bio: profileData.bio,
-        best_at: profileData.bestAt || [],
-        experience_highlights: profileData.experienceHighlights || [],
-        // Generated fields
-        open_to: openTo,
-        focus_areas: focusAreas,
-        recent_wins: [],
-        social_proof: socialProof,
-        lifetime_earned: 0,
-        last_payout: 0,
-        total_gigs_completed: 0
-      });
+      .upsert(profilePayload)
+      .select();
 
     if (profileError) {
       console.error('Error saving profile:', profileError);
