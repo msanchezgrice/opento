@@ -320,12 +320,13 @@
           </div>
           <div class="step-actions">
             <button class="btn gray" data-back>Back</button>
-            <button class="btn primary" data-next>Continue</button>
+            <button class="btn primary large-btn" data-finish>Build my agent</button>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Step 4: What are you open to? -->
+    <!-- Preview Panel (Sticky on desktop) -->
       <div class="step" data-step="4">
         <div class="step-content">
           <div class="step-header">
@@ -387,43 +388,7 @@
         </div>
       </div>
 
-      <!-- Step 6: Privacy preferences -->
-      <div class="step" data-step="6">
-        <div class="step-content">
-          <div class="step-header">
-            <div class="step-number">6</div>
-            <h2>Privacy & consent</h2>
-            <p class="sub">Control what you share and when your identity is revealed.</p>
-          </div>
-          <div class="privacy-section">
-            <div class="scope-card">
-              <h3>What will be shared</h3>
-              <div class="scope">
-                <div class="item allow">✔ Share: role, anonymized KPIs, case studies</div>
-                <div class="item deny">✖ Hide: employer names, exact spend history</div>
-              </div>
-            </div>
-            <div class="option-card privacy-card">
-              <div class="option-card-header">
-                <div class="switch on" data-label="Anonymous first"></div>
-                <h3>Anonymous first</h3>
-              </div>
-              <p class="small">Identity reveals only after you accept + escrow is confirmed.</p>
-            </div>
-            <div class="option-card privacy-card">
-              <div class="option-card-header">
-                <div class="switch on" data-label="Consent reminders"></div>
-                <h3>Consent reminders</h3>
-              </div>
-              <p class="small">Show what's shared before each accept so you stay in control.</p>
-            </div>
-          </div>
-          <div class="step-actions">
-            <button class="btn gray" data-back>Back</button>
-            <button class="btn primary large-btn" data-finish>Build my agent</button>
-          </div>
-        </div>
-      </div>
+
     </div>
 
     <!-- Preview Panel (Sticky on desktop) -->
@@ -787,10 +752,15 @@
       }
       
       // Gather context
+      const seniorityLevel = document.getElementById('seniorityLevel')?.value || 'Senior';
+      // Derive years from seniority
+      const yearsMap = { 'Junior': 2, 'Mid': 4, 'Senior': 8, 'Lead': 12, 'Executive': 18 };
+      const yearsExperience = yearsMap[seniorityLevel] || 6;
+      
       const context = {
         skills: window.getSelectedSkills ? window.getSelectedSkills() : [],
-        seniorityLevel: document.getElementById('seniorityLevel')?.value || 'Senior',
-        yearsExperience: document.getElementById('years')?.value || 6,
+        seniorityLevel: seniorityLevel,
+        yearsExperience: yearsExperience,
         currentCompany: document.getElementById('currentCompany')?.value || '',
         industries: window.getSelectedIndustries ? window.getSelectedIndustries() : [],
         location: document.getElementById('location')?.value || '',
