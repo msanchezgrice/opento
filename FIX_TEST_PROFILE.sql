@@ -23,11 +23,13 @@ SET
     'Achieved 95% retention across $5M portfolio',
     '50+ enterprise accounts managed',
     'Closed $2M in upsells last year'
-  ],
-  skills = ARRAY['account management', 'consulting', 'copywriting', 'customer success', 'relationship management']
+  ]
 WHERE user_id IN (
   SELECT id FROM users WHERE handle = 'test-12'
 );
+
+-- Note: Skills are stored in user_skills table, not agent_profiles
+-- Your skills from onboarding should already be there
 
 -- Verify it worked
 SELECT 
