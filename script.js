@@ -1174,7 +1174,27 @@ function initializeChat() {
         }
 
         const data = await response.json();
-        return data.reply;
+        let reply = data.reply;
+        
+        // Check if response includes intro button marker
+        if (reply.includes('[SHOW_INTRO_BUTTON]')) {
+          // Remove marker and add button functionality
+          reply = reply.replace('[SHOW_INTRO_BUTTON]', '');
+          
+          // Schedule button to be added after message is displayed
+          setTimeout(() => {
+            const lastMessage = chatMessages.lastElementChild;
+            if (lastMessage && lastMessage.classList.contains('bot')) {
+              const buttonDiv = document.createElement('div');
+              buttonDiv.style.marginTop = '12px';
+              buttonDiv.innerHTML = '<button class="btn primary" style="padding: 10px 20px;" onclick="document.getElementById(\'chatModal\').style.display=\'none\'; document.getElementById(\'introModal\').style.display=\'flex\'; document.getElementById(\'introName\')?.focus();">Send Intro Request</button>';
+              lastMessage.appendChild(buttonDiv);
+              track('Chat Intro Button Shown');
+            }
+          }, 100);
+        }
+        
+        return reply;
 
       } catch (error) {
         console.error('Chat API error:', error);
