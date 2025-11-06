@@ -122,52 +122,81 @@
       const profile = agent.agent_profiles?.[0] || agent.agent_profile || {};
       const skills = agent.user_skills?.map(us => us.skill?.name).filter(Boolean) || [];
       const topSkills = skills.slice(0, 3);
-      
+
       const earnings = profile.lifetime_earned || 0;
       const gigs = profile.total_gigs_completed || 0;
-      
+
       // Use professional_title from profile, fallback to role
       const title = profile.professional_title || agent.role || 'Professional';
       const bio = profile.bio || agent.summary || 'Building their presence on Opento';
       const seniorityLevel = profile.seniority_level;
-      
+      const yearsInRole = profile.years_in_role;
+      const location = agent.location;
+
+      // Calculate hourly rate from agent settings
+      const settings = agent.agent_settings?.[0] || agent.settings || {};
+      const consultFloor = settings.consult_floor_30m || 75;
+      const hourlyRate = consultFloor * 2; // 30min rate * 2 = hourly
+
       return `
-        <div class="card" style="display: flex; flex-direction: column; gap: 12px;">
-          <div style="display: flex; gap: 12px; align-items: start;">
-            <div class="handle-avatar" style="width: 48px; height: 48px; font-size: 18px; overflow: hidden;">
-              ${agent.avatar_url 
-                ? `<img src="${agent.avatar_url}" alt="${agent.display_name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` 
-                : (agent.avatar_initials || 'U')
+        <div class="card" style="display: flex; flex-direction: column; gap: 16px; position: relative;">
+          <!-- Header with avatar and name -->
+          <div style="display: flex; gap: 16px; align-items: start;">
+            <div style="width: 80px; height: 80px; border-radius: 50%; overflow: hidden; flex-shrink: 0; border: 3px solid #E2E8F0;">
+              ${agent.avatar_url
+                ? `<img src="${agent.avatar_url}" alt="${agent.display_name}" style="width: 100%; height: 100%; object-fit: cover;">`
+                : `<div class="handle-avatar" style="width: 100%; height: 100%; font-size: 28px; display: flex; align-items: center; justify-content: center;">${agent.avatar_initials || 'U'}</div>`
               }
             </div>
-            <div style="flex: 1;">
-              <strong>${agent.display_name || 'Anonymous'}</strong>
-              <div class="small" style="color: #64748B;">@${agent.handle}</div>
-              ${seniorityLevel ? `<div class="chip" style="display: inline-block; margin-top: 4px; font-size: 11px;">${seniorityLevel}</div>` : ''}
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                <h3 style="margin: 0; font-size: 20px; font-weight: 600;">${agent.display_name || 'Anonymous'}</h3>
+                ${agent.avatar_url ? '<span style="font-size: 18px;">✓</span>' : ''}
+              </div>
+              <div style="font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 4px;">${title}</div>
+              ${location ? `
+                <div style="display: flex; align-items: center; gap: 4px; color: #64748B; font-size: 13px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                  ${location}
+                </div>
+              ` : ''}
             </div>
           </div>
-          
-          <div>
-            <div class="small" style="font-weight: 600; color: var(--text); margin-bottom: 4px;">${title}</div>
-            <p class="small" style="color: #64748B; margin: 0;">${bio}</p>
+
+          <!-- Stats grid -->
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; padding: 12px 0;">
+            <div>
+              <div style="font-size: 12px; color: #64748B; margin-bottom: 2px;">Hourly</div>
+              <div style="font-size: 18px; font-weight: 600;">${formatUsd(hourlyRate)}</div>
+            </div>
+            ${yearsInRole ? `
+              <div>
+                <div style="font-size: 12px; color: #64748B; margin-bottom: 2px;">Experience</div>
+                <div style="font-size: 18px; font-weight: 600;">${yearsInRole} year${yearsInRole !== 1 ? 's' : ''}</div>
+              </div>
+            ` : `
+              <div>
+                <div style="font-size: 12px; color: #64748B; margin-bottom: 2px;">Earnings</div>
+                <div style="font-size: 18px; font-weight: 600;">${formatUsd(earnings)}</div>
+              </div>
+            `}
           </div>
-          
+
+          <!-- Top skills -->
           ${topSkills.length > 0 ? `
-            <div class="chips">
-              ${topSkills.map(skill => `<div class="chip">${skill}</div>`).join('')}
+            <div>
+              <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">Top ${topSkills.length} skill${topSkills.length !== 1 ? 's' : ''}</div>
+              <div class="chips" style="gap: 6px;">
+                ${topSkills.map(skill => `<div class="chip" style="background: #E2E8F0; color: #334155; font-size: 13px; padding: 6px 12px;">${skill}</div>`).join('')}
+              </div>
             </div>
           ` : ''}
-          
-          <div style="display: flex; gap: 16px; padding-top: 8px; border-top: 1px solid #E2E8F0;">
-            <div class="small">
-              <strong>${formatUsd(earnings)}</strong> earned
-            </div>
-            <div class="small">
-              <strong>${gigs}</strong> gigs
-            </div>
-          </div>
-          
-          <a href="handle.html?u=${agent.handle}" class="btn">View profile</a>
+
+          <!-- View profile button -->
+          <a href="handle.html?u=${agent.handle}" class="btn" style="margin-top: 4px;">View profile</a>
         </div>
       `;
     }
