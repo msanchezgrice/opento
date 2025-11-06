@@ -276,10 +276,10 @@ small, .small { color: var(--muted); }
 
 /* Option cards for service categories */
 .options-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap:16px; margin-top:20px; }
-.option-card { background: var(--card); border:2px solid var(--border); border-radius:16px; padding:20px; cursor:pointer; transition: all .2s ease; box-shadow: var(--shadow-1); }
+.option-card { background: var(--card); border:2px solid var(--border); border-radius:16px; padding:20px; cursor:pointer; transition: all .2s ease; box-shadow: var(--shadow-1); user-select: none; -webkit-tap-highlight-color: transparent; }
 .option-card:hover { border-color:var(--primary); transform: translateY(-2px); box-shadow: 0 12px 28px rgba(45,111,255,0.15); }
 .option-card.active { border-color:var(--primary); background:#f8faff; }
-.option-card-header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px; }
+.option-card-header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px; pointer-events: none; }
 .option-card h3 { margin:0; font-size:18px; letter-spacing:-0.01em; }
 .option-card .small { color:var(--muted); line-height:1.5; }
 
@@ -294,7 +294,7 @@ small, .small { color: var(--muted); }
 .option { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:12px 14px; border:1px solid var(--border); border-radius:12px; background: var(--card); box-shadow: var(--shadow-1); margin-top:12px; }
 .option strong { font-size:16px; }
 .option .small { margin-top:4px; }
-.switch { width:52px; height:30px; border-radius:999px; background:#e5e7eb; position:relative; cursor:pointer; transition: all .25s ease; flex-shrink:0; }
+.switch { width:52px; height:30px; border-radius:999px; background:#e5e7eb; position:relative; cursor:pointer; transition: all .25s ease; flex-shrink:0; pointer-events: none; }
 .switch::after { content:""; position:absolute; top:3px; left:3px; width:24px; height:24px; border-radius:50%; background:#fff; box-shadow:0 2px 8px rgba(15,23,42,0.2); transition: transform .25s ease; }
 .switch.on { background:var(--primary); }
 .switch.on::after { transform: translateX(22px); }
