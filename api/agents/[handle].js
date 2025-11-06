@@ -34,22 +34,37 @@ export default async function handler(req, res) {
     // Fetch user with all related data
     const { data: user, error: userError } = await supabase
       .from('users')
-      .select(`
-        *,
-        user_skills (
-          years_experience,
-          skill:skills (
-            id,
-            name,
-            category,
-            tier
-          )
-        ),
-        agent_settings (*),
-        agent_profiles (*)
-      `)
+      .select('*')
       .eq('handle', handle)
       .single();
+
+    if (!user) {
+      console.error('User not found for handle:', handle);
+      return res.status(404).json({ error: 'Agent not found' });
+    }
+
+    // Fetch related data separately to avoid join issues
+    const { data: skills } = await supabase
+      .from('user_skills')
+      .select('years_experience, skill:skills(id, name, category, tier)')
+      .eq('user_id', user.id);
+
+    const { data: settings } = await supabase
+      .from('agent_settings')
+      .select('*')
+      .eq('user_id', user.id)
+      .single();
+
+    const { data: profile } = await supabase
+      .from('agent_profiles')
+      .select('*')
+      .eq('user_id', user.id)
+      .single();
+
+    // Attach to user object for consistency with existing code
+    user.user_skills = skills || [];
+    user.agent_settings = settings ? [settings] : [];
+    user.agent_profiles = profile ? [profile] : [];
 
     // DEBUG: Log what Supabase returned
     console.log('Supabase query result for', handle, ':');

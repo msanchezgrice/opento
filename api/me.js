@@ -19,13 +19,36 @@ export default async function handler(req, res) {
 
     const { data: user, error } = await supabase
       .from('users')
-      .select(`*, user_skills(years_experience, skill:skills(*)), agent_settings(*), agent_profiles(*)`)
+      .select('*')
       .eq('id', userId)
       .single();
 
     if (error || !user) return res.status(404).json({ error: 'User not found' });
 
-    const profile = user.agent_profiles?.[0] || {};
+    // Fetch related data separately to avoid join issues
+    const { data: skills } = await supabase
+      .from('user_skills')
+      .select('years_experience, skill:skills(*)')
+      .eq('user_id', user.id);
+
+    const { data: settings } = await supabase
+      .from('agent_settings')
+      .select('*')
+      .eq('user_id', user.id)
+      .single();
+
+    const { data: profile } = await supabase
+      .from('agent_profiles')
+      .select('*')
+      .eq('user_id', user.id)
+      .single();
+
+    // Attach to user object
+    user.user_skills = skills || [];
+    user.agent_settings = settings ? [settings] : [];
+    user.agent_profiles = profile ? [profile] : [];
+
+    const profileData = user.agent_profiles?.[0] || {};
     
     const userData = {
       id: user.id,
@@ -39,16 +62,16 @@ export default async function handler(req, res) {
       summary: user.summary,
       skills: user.user_skills?.map(us => ({ id: us.skill?.id, name: us.skill?.name, category: us.skill?.category, years: us.years_experience })) || [],
       settings: user.agent_settings?.[0] || null,
-      profile: profile,
+      profile: profileData,
       // Flatten enhanced profile fields for easy access
-      professional_title: profile.professional_title,
-      bio: profile.bio,
-      seniority_level: profile.seniority_level,
-      current_company: profile.current_company,
-      years_in_role: profile.years_in_role,
-      industries: profile.industries || [],
-      best_at: profile.best_at || [],
-      experience_highlights: profile.experience_highlights || []
+      professional_title: profileData.professional_title,
+      bio: profileData.bio,
+      seniority_level: profileData.seniority_level,
+      current_company: profileData.current_company,
+      years_in_role: profileData.years_in_role,
+      industries: profileData.industries || [],
+      best_at: profileData.best_at || [],
+      experience_highlights: profileData.experience_highlights || []
     };
 
     return res.status(200).json(userData);
