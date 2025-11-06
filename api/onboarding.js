@@ -141,8 +141,6 @@ export default async function handler(req, res) {
 
     const profilePayload = {
       user_id: userId,
-      location: profileData.location || null,
-      years_experience: profileData.yearsExperience ? parseInt(profileData.yearsExperience) : null,
       // Enhanced fields
       seniority_level: seniorityLevel || null,
       current_company: currentCompany || null,
