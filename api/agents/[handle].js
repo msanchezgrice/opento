@@ -1,5 +1,6 @@
 // API endpoint to get agent data by handle
 // GET /api/agents/:handle
+// Updated: 2025-11-06 - Returns enhanced onboarding fields
 
 import { createClient } from '@supabase/supabase-js';
 
