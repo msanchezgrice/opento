@@ -67,8 +67,11 @@ export default async function handler(req, res) {
       location: user.location || '',
       email: user.email,
       
-      // Skills
-      skills: user.user_skills?.map(us => ({
+      // Skills - return as array of strings for display
+      skills: user.user_skills?.map(us => us.skill?.name).filter(Boolean) || [],
+      
+      // Also keep detailed skills for other uses
+      skillsDetailed: user.user_skills?.map(us => ({
         name: us.skill?.name || '',
         category: us.skill?.category || '',
         tier: us.skill?.tier || '',
@@ -91,6 +94,20 @@ export default async function handler(req, res) {
       openTo: user.agent_profiles?.[0]?.open_to || [],
       recentWins: user.agent_profiles?.[0]?.recent_wins || [],
       socialProof: user.agent_profiles?.[0]?.social_proof || [],
+      
+      // NEW: User-authored profile content
+      professional_title: user.agent_profiles?.[0]?.professional_title || null,
+      bio: user.agent_profiles?.[0]?.bio || null,
+      best_at: user.agent_profiles?.[0]?.best_at || [],
+      experience_highlights: user.agent_profiles?.[0]?.experience_highlights || [],
+      
+      // Enhanced fields
+      seniority_level: user.agent_profiles?.[0]?.seniority_level || null,
+      current_company: user.agent_profiles?.[0]?.current_company || null,
+      years_in_role: user.agent_profiles?.[0]?.years_in_role || null,
+      industries: user.agent_profiles?.[0]?.industries || [],
+      yearsExperience: user.agent_profiles?.[0]?.years_experience || null,
+      avatar_url: user.avatar_url || null,
       
       // Stats
       activity: {
