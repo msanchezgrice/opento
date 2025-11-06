@@ -78,8 +78,7 @@ export default async function handler(req, res) {
         last_payout: 0,
         total_gigs_completed: 0
       })
-      .select()
-      .single();
+      .select('user_id, professional_title, bio');
 
     if (profileError) {
       console.error('Profile creation error:', profileError);
