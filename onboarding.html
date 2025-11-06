@@ -195,11 +195,81 @@
         </div>
       </div>
 
-      <!-- Step 2: Your online presence -->
+      <!-- Step 2: Tell Your Story (NEW) -->
       <div class="step" data-step="2">
         <div class="step-content">
           <div class="step-header">
             <div class="step-number">2</div>
+            <h2>Tell your story</h2>
+            <p class="sub">Help brands understand what makes you unique. AI can help you write this!</p>
+          </div>
+          
+          <div class="inputs">
+            <label class="input" style="grid-column: 1 / -1;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <span>Professional title</span>
+                <button type="button" class="btn small gray" onclick="getSuggestion('title')" style="margin-left: auto;">
+                  ✨ Get Help
+                </button>
+              </div>
+              <input id="professionalTitle" type="text" placeholder="e.g., Senior Growth Marketing Lead" required>
+              <div class="small muted">How you describe yourself professionally (will show on your profile)</div>
+            </label>
+            
+            <label class="input" style="grid-column: 1 / -1;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <span>About you (2-3 sentences)</span>
+                <button type="button" class="btn small gray" onclick="getSuggestion('bio')" style="margin-left: auto;">
+                  ✨ Get Help
+                </button>
+              </div>
+              <textarea id="bio" rows="4" placeholder="I help B2B SaaS companies reduce CAC through experimentation and creative testing. Specialized in attribution modeling and lifecycle optimization." required></textarea>
+              <div class="small muted">What problems do you solve? What makes you unique? (Write in first person)</div>
+            </label>
+            
+            <div style="grid-column: 1 / -1;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                <span><strong>What you're best at</strong> (3-5 bullet points)</span>
+                <button type="button" class="btn small gray" onclick="getSuggestion('best_at')" style="margin-left: auto;">
+                  ✨ Get Help
+                </button>
+              </div>
+              <div id="bestAtList" style="display: grid; gap: 8px;">
+                <input type="text" class="best-at-input" placeholder="e.g., Building acquisition funnels that convert at 20%+" data-index="0">
+                <input type="text" class="best-at-input" placeholder="e.g., Reducing CAC through creative testing" data-index="1">
+                <input type="text" class="best-at-input" placeholder="e.g., Attribution modeling across Meta/Google/TikTok" data-index="2">
+              </div>
+              <div class="small muted" style="margin-top: 8px;">Be specific! Use metrics when possible.</div>
+            </div>
+            
+            <div style="grid-column: 1 / -1;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                <span><strong>Recent wins or achievements</strong> (3 bullet points)</span>
+                <button type="button" class="btn small gray" onclick="getSuggestion('highlights')" style="margin-left: auto;">
+                  ✨ Get Help
+                </button>
+              </div>
+              <div id="highlightsList" style="display: grid; gap: 8px;">
+                <input type="text" class="highlight-input" placeholder="e.g., Cut blended CAC by 22% for Looply in two weeks" data-index="0">
+                <input type="text" class="highlight-input" placeholder="e.g., Grew trial-to-paid conversion by 18%" data-index="1">
+                <input type="text" class="highlight-input" placeholder="e.g., Managed $3.2M/yr in ad spend across 3 channels" data-index="2">
+              </div>
+              <div class="small muted" style="margin-top: 8px;">Include numbers and outcomes. These build credibility!</div>
+            </div>
+          </div>
+          
+          <div class="step-actions">
+            <button class="btn gray" data-back>Back</button>
+            <button class="btn primary" data-next>Continue</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Your online presence -->
+      <div class="step" data-step="3">
+        <div class="step-content">
+          <div class="step-header">
+            <div class="step-number">3</div>
             <h2>Your online presence</h2>
             <p class="sub">Optional: Add your professional profiles to boost trust and match quality.</p>
           </div>
@@ -706,6 +776,80 @@
     
     // Make selected industries available globally
     window.getSelectedIndustries = () => selectedIndustries;
+    
+    // AI-powered Get Help functionality
+    let suggestionLoading = false;
+    
+    window.getSuggestion = async function(field) {
+      if (suggestionLoading) {
+        alert('Please wait for the current suggestion to finish...');
+        return;
+      }
+      
+      // Gather context
+      const context = {
+        skills: window.getSelectedSkills ? window.getSelectedSkills() : [],
+        seniorityLevel: document.getElementById('seniorityLevel')?.value || 'Senior',
+        yearsExperience: document.getElementById('years')?.value || 6,
+        currentCompany: document.getElementById('currentCompany')?.value || '',
+        industries: window.getSelectedIndustries ? window.getSelectedIndustries() : [],
+        location: document.getElementById('location')?.value || '',
+        professionalTitle: document.getElementById('professionalTitle')?.value || ''
+      };
+      
+      // Show loading
+      suggestionLoading = true;
+      const button = event.target;
+      const originalText = button.textContent;
+      button.textContent = '⏳ Thinking...';
+      button.disabled = true;
+      
+      try {
+        const response = await fetch('/api/suggest/profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ field, context })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to get suggestion');
+        }
+        
+        const data = await response.json();
+        
+        // Apply suggestion to the appropriate field
+        if (field === 'title') {
+          document.getElementById('professionalTitle').value = data.suggestion;
+        } else if (field === 'bio') {
+          document.getElementById('bio').value = data.suggestion;
+        } else if (field === 'best_at') {
+          const inputs = document.querySelectorAll('.best-at-input');
+          data.suggestion.forEach((text, i) => {
+            if (inputs[i]) inputs[i].value = text;
+          });
+        } else if (field === 'highlights') {
+          const inputs = document.querySelectorAll('.highlight-input');
+          data.suggestion.forEach((text, i) => {
+            if (inputs[i]) inputs[i].value = text;
+          });
+        }
+        
+        // Show success briefly
+        button.textContent = '✅ Added!';
+        setTimeout(() => {
+          button.textContent = originalText;
+          button.disabled = false;
+          suggestionLoading = false;
+        }, 2000);
+        
+      } catch (error) {
+        console.error('Suggestion error:', error);
+        alert('Could not generate suggestion. Please try again or write it yourself.');
+        button.textContent = originalText;
+        button.disabled = false;
+        suggestionLoading = false;
+      }
+    };
   </script>
 </body>
 </html>
