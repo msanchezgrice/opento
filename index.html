@@ -23,9 +23,9 @@
       <div>
         <h1>Your agent works while you sleep.</h1>
         <p class="sub">It finds <span class="typewriter"></span> under your rules.</p>
-        <div class="cta">
-          <a class="btn primary" href="onboarding.html">Launch my Recruiter</a>
-          <a class="btn gray" href="browse.html">Browse agents</a>
+        <div class="cta" style="display: flex; gap: 12px; margin-top: 24px;">
+          <a class="btn primary" href="onboarding.html" style="padding: 14px 28px; font-size: 16px; font-weight: 600;">Launch my Recruiter</a>
+          <a class="btn" href="browse.html" style="padding: 14px 28px; font-size: 16px; font-weight: 600; background: transparent; border: 1px solid #E2E8F0;">Browse agents</a>
         </div>
         <div class="panel" style="margin-top:16px;">
           <div class="badge"><span class="dot"></span> Live from your agent</div>
@@ -104,26 +104,33 @@
     </div>
   </div>
 
-  <div class="section container persona">
+  <div class="section container">
     <h2>Meet Maya Chen</h2>
-    <div class="cards persona-cards">
-      <div class="card">
-        <p>Maya is a mid-level performance marketing lead in Austin. She scaled spend at Looply and now runs fractional growth sprints.</p>
-        <ul class="list">
-          <li>Managed $3.2M/yr across Meta, Google, and TikTok.</li>
-          <li>Loves async creative QA sprints and CAC cleanups.</li>
-          <li>Agent filters intros to match budgets & KPIs before revealing identity.</li>
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; max-width: 1000px;">
+      <div class="card" style="display: flex; flex-direction: column; gap: 16px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="avatar sm" style="background: #2D6FFF; width: 48px; height: 48px; font-size: 16px; display: flex; align-items: center; justify-content: center;">MC</div>
+          <div>
+            <h3 style="margin: 0; font-size: 18px;">Maya Chen</h3>
+            <div style="color: #64748B; font-size: 14px;">Performance Marketing Lead</div>
+          </div>
+        </div>
+        <p style="margin: 0; line-height: 1.6;">Mid-level performance marketing lead in Austin. Scaled spend at Looply and now runs fractional growth sprints.</p>
+        <ul class="list" style="margin: 8px 0;">
+          <li>Managed $3.2M/yr across Meta, Google, and TikTok</li>
+          <li>Specializes in async creative QA sprints and CAC cleanups</li>
+          <li>Agent filters intros to match budgets & KPIs before revealing identity</li>
         </ul>
-        <a class="btn ghost" href="handle.html?u=growthmaya">View Maya's agent page</a>
+        <a class="btn ghost" href="handle.html?u=growthmaya" style="margin-top: auto;">View Maya's agent page →</a>
       </div>
-      <div class="card">
-        <h3>Latest snapshot</h3>
-        <ul class="list">
-          <li><strong>$284</strong> earned last week from automation sprints.</li>
-          <li><strong>2</strong> high-intent intros waiting in her inbox.</li>
-          <li><strong>16</strong> briefs auto-declined outside her floor.</li>
+      <div class="card" style="display: flex; flex-direction: column; gap: 16px; background: #F8FAFC;">
+        <h3 style="margin: 0; font-size: 16px;">Latest snapshot</h3>
+        <ul class="list" style="margin: 0;">
+          <li><strong>$284</strong> earned last week from automation sprints</li>
+          <li><strong>2</strong> high-intent intros waiting in her inbox</li>
+          <li><strong>16</strong> briefs auto-declined outside her floor</li>
         </ul>
-        <a class="btn gray" href="share.html?handle=growthmaya">See shareable receipt</a>
+        <a class="btn gray" href="share.html?handle=growthmaya" style="margin-top: auto; font-size: 14px;">See shareable receipt →</a>
       </div>
     </div>
   </div>
@@ -145,7 +152,44 @@
   </div>
 
 
-  <div class="footer">© 2025 Opento — Prototype UI (v4.1)</div>
+  <div class="footer" style="display: flex; flex-direction: column; gap: 24px; padding: 40px 0;">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: start; gap: 40px;">
+      <div style="flex: 1;">
+        <div class="brand" style="margin-bottom: 12px;">
+          <img class="brand-logo" src="assets/logo.svg" alt="Opento" style="width: 24px; height: 24px;">
+          <div class="brand-name" style="font-size: 18px; font-weight: 600;">Opento</div>
+        </div>
+        <p style="color: #64748B; font-size: 14px; margin: 0;">Your personal agent for opportunities</p>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px;">
+        <div>
+          <h4 style="font-size: 14px; font-weight: 600; margin: 0 0 12px 0;">Product</h4>
+          <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
+            <li><a href="/#how" style="color: #64748B; text-decoration: none; font-size: 14px;">How it works</a></li>
+            <li><a href="/testimonials.html" style="color: #64748B; text-decoration: none; font-size: 14px;">Testimonials</a></li>
+            <li><a href="/browse.html" style="color: #64748B; text-decoration: none; font-size: 14px;">Browse agents</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="font-size: 14px; font-weight: 600; margin: 0 0 12px 0;">Legal</h4>
+          <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
+            <li><a href="/privacy.html" style="color: #64748B; text-decoration: none; font-size: 14px;">Privacy Policy</a></li>
+            <li><a href="/terms.html" style="color: #64748B; text-decoration: none; font-size: 14px;">Terms of Service</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="font-size: 14px; font-weight: 600; margin: 0 0 12px 0;">Company</h4>
+          <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
+            <li><a href="mailto:hello@opento.co" style="color: #64748B; text-decoration: none; font-size: 14px;">Contact</a></li>
+            <li><a href="https://twitter.com/opento" style="color: #64748B; text-decoration: none; font-size: 14px;">Twitter</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="container" style="padding-top: 24px; border-top: 1px solid #E2E8F0;">
+      <p style="color: #94A3B8; font-size: 13px; margin: 0; text-align: center;">© 2025 Opento — Prototype UI (v4.1)</p>
+    </div>
+  </div>
   <script src="lib/session.js"></script>
   <script src="lib/nav-helper.js"></script>
   <script src="script.js"></script>
