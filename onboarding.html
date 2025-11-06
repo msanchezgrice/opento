@@ -824,12 +824,14 @@
           document.getElementById('bio').value = data.suggestion;
         } else if (field === 'best_at') {
           const inputs = document.querySelectorAll('.best-at-input');
-          data.suggestion.forEach((text, i) => {
+          const suggestions = Array.isArray(data.suggestion) ? data.suggestion : [data.suggestion];
+          suggestions.forEach((text, i) => {
             if (inputs[i]) inputs[i].value = text;
           });
         } else if (field === 'highlights') {
           const inputs = document.querySelectorAll('.highlight-input');
-          data.suggestion.forEach((text, i) => {
+          const suggestions = Array.isArray(data.suggestion) ? data.suggestion : [data.suggestion];
+          suggestions.forEach((text, i) => {
             if (inputs[i]) inputs[i].value = text;
           });
         }
