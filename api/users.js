@@ -90,6 +90,45 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Failed to create user', details: userError });
     }
 
+    // Create default agent_settings and agent_profiles
+    // This ensures they always exist even if onboarding flow fails
+    const { error: settingsError } = await supabase
+      .from('agent_settings')
+      .insert({
+        user_id: user.id,
+        consult_floor_30m: 75,
+        async_floor_5m: 12,
+        weekly_hours: 6,
+        availability_window: 'Mon–Thu 11a–4p CT',
+        anonymous_first: true,
+        consent_reminders: true,
+        auto_accept_fast: false,
+        categories: []
+      });
+
+    if (settingsError) {
+      console.error('Error creating default settings:', settingsError);
+      // Don't fail user creation, just log the error
+    }
+
+    const { error: profileError } = await supabase
+      .from('agent_profiles')
+      .insert({
+        user_id: user.id,
+        open_to: [],
+        focus_areas: [],
+        recent_wins: [],
+        social_proof: [],
+        lifetime_earned: 0,
+        last_payout: 0,
+        total_gigs_completed: 0
+      });
+
+    if (profileError) {
+      console.error('Error creating default profile:', profileError);
+      // Don't fail user creation, just log the error
+    }
+
     // Return user data
     return res.status(201).json({
       user,
