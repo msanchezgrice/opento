@@ -417,6 +417,28 @@
     </div>
   </div>
 
+  <!-- Name Modal -->
+  <div id="nameModal" class="modal" style="display: none;">
+    <div class="dialog" style="max-width: 480px;">
+      <header>
+        <div>
+          <strong>What's your name?</strong>
+          <p class="small">This will be displayed on your public agent profile</p>
+        </div>
+      </header>
+      <main>
+        <label class="input">
+          <span>Full name</span>
+          <input id="nameModalInput" type="text" placeholder="e.g., Maya Chen" autofocus>
+        </label>
+      </main>
+      <footer>
+        <button class="btn gray" id="nameModalCancel">Cancel</button>
+        <button class="btn primary" id="nameModalConfirm">Continue</button>
+      </footer>
+    </div>
+  </div>
+
   <script src="script.js"></script>
   <script src="lib/skills-selector.js"></script>
   <script src="lib/onboarding-integration.js"></script>
