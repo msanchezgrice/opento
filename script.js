@@ -322,11 +322,24 @@ function updateOnboardingPreview(currentStep){
     setText('#previewLocation', location);
   }
   if(skills){
-    const skillsList = skills.split(',').map(s => s.trim()).filter(Boolean).slice(0, 3);
+    // Handle both comma-separated string and JSON array format
+    let skillsList = [];
+    try {
+      // Try parsing as JSON first (in case it's stored as ["skill1", "skill2"])
+      if (skills.startsWith('[')) {
+        skillsList = JSON.parse(skills);
+      } else {
+        skillsList = skills.split(',').map(s => s.trim()).filter(Boolean);
+      }
+    } catch (e) {
+      // Fallback to comma-separated
+      skillsList = skills.split(',').map(s => s.trim()).filter(Boolean);
+    }
+    
     const skillsEl = qs('#previewSkills');
     if(skillsEl){
       skillsEl.innerHTML = skillsList.length
-        ? skillsList.map(s => `<div class="chip small">${s}</div>`).join('')
+        ? skillsList.slice(0, 3).map(s => `<div class="chip small">${s}</div>`).join('')
         : '';
     }
   }
