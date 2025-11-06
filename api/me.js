@@ -25,6 +25,8 @@ export default async function handler(req, res) {
 
     if (error || !user) return res.status(404).json({ error: 'User not found' });
 
+    const profile = user.agent_profiles?.[0] || {};
+    
     const userData = {
       id: user.id,
       handle: user.handle,
@@ -37,7 +39,16 @@ export default async function handler(req, res) {
       summary: user.summary,
       skills: user.user_skills?.map(us => ({ id: us.skill?.id, name: us.skill?.name, category: us.skill?.category, years: us.years_experience })) || [],
       settings: user.agent_settings?.[0] || null,
-      profile: user.agent_profiles?.[0] || null
+      profile: profile,
+      // Flatten enhanced profile fields for easy access
+      professional_title: profile.professional_title,
+      bio: profile.bio,
+      seniority_level: profile.seniority_level,
+      current_company: profile.current_company,
+      years_in_role: profile.years_in_role,
+      industries: profile.industries || [],
+      best_at: profile.best_at || [],
+      experience_highlights: profile.experience_highlights || []
     };
 
     return res.status(200).json(userData);

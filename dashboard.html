@@ -98,19 +98,86 @@
             </label>
             
             <label class="input">
-              <span>Role / Title *</span>
-              <input type="text" id="profileRole" required placeholder="e.g., Performance Marketer">
+              <span>Professional Title *</span>
+              <input type="text" id="profileProfessionalTitle" required placeholder="e.g., Senior Growth Marketing Lead">
+              <div class="small muted">How you describe yourself professionally</div>
             </label>
             
             <label class="input">
-              <span>Bio / Summary</span>
-              <textarea id="profileSummary" rows="4" placeholder="A brief description of your expertise and background"></textarea>
+              <span>Bio (2-3 sentences)</span>
+              <textarea id="profileBio" rows="4" placeholder="I help B2B SaaS companies reduce CAC through experimentation and creative testing."></textarea>
+              <div class="small muted">What problems do you solve? What makes you unique?</div>
             </label>
             
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <label class="input">
+                <span>Role / Category</span>
+                <input type="text" id="profileRole" placeholder="e.g., Performance Marketer">
+                <div class="small muted">For categorization</div>
+              </label>
+              
+              <label class="input">
+                <span>Location</span>
+                <input type="text" id="profileLocation" placeholder="e.g., Austin, TX">
+              </label>
+            </div>
+            
+            <h3 style="margin: 20px 0 12px;">Professional Background</h3>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+              <label class="input">
+                <span>Seniority Level</span>
+                <select id="profileSeniorityLevel">
+                  <option value="">Select...</option>
+                  <option value="Junior">Junior</option>
+                  <option value="Mid">Mid</option>
+                  <option value="Senior">Senior</option>
+                  <option value="Lead">Lead</option>
+                  <option value="Executive">Executive</option>
+                </select>
+              </label>
+              
+              <label class="input">
+                <span>Current Company</span>
+                <input type="text" id="profileCurrentCompany" placeholder="e.g., Google">
+              </label>
+              
+              <label class="input">
+                <span>Years in Role</span>
+                <select id="profileYearsInRole">
+                  <option value="">Select...</option>
+                  <option value="0">< 1 year</option>
+                  <option value="1">1 year</option>
+                  <option value="2">2 years</option>
+                  <option value="3">3 years</option>
+                  <option value="4">4 years</option>
+                  <option value="5">5 years</option>
+                  <option value="6">6+ years</option>
+                </select>
+              </label>
+            </div>
+            
             <label class="input">
-              <span>Location</span>
-              <input type="text" id="profileLocation" placeholder="e.g., Austin, TX">
+              <span>Industries</span>
+              <input type="text" id="profileIndustries" placeholder="e.g., SaaS, Fintech, E-commerce (comma separated)">
+              <div class="small muted">Separate with commas</div>
             </label>
+            
+            <h3 style="margin: 20px 0 12px;">What You're Best At</h3>
+            <div id="bestAtInputs" style="display: grid; gap: 8px;">
+              <input type="text" class="profile-best-at-input" placeholder="e.g., Building acquisition funnels that convert at 20%+">
+              <input type="text" class="profile-best-at-input" placeholder="e.g., Reducing CAC through creative testing">
+              <input type="text" class="profile-best-at-input" placeholder="e.g., Attribution modeling across Meta/Google/TikTok">
+            </div>
+            <div class="small muted">Be specific! Use metrics when possible.</div>
+            
+            <h3 style="margin: 20px 0 12px;">Recent Wins or Achievements</h3>
+            <div id="highlightsInputs" style="display: grid; gap: 8px;">
+              <input type="text" class="profile-highlight-input" placeholder="e.g., Cut blended CAC by 22% for Looply in two weeks">
+              <input type="text" class="profile-highlight-input" placeholder="e.g., Grew trial-to-paid conversion by 18%">
+              <input type="text" class="profile-highlight-input" placeholder="e.g., Managed $3.2M/yr in ad spend across 3 channels">
+            </div>
+            <div class="small muted">Include numbers and outcomes. These build credibility!</div>
             
             <label class="input">
               <span>Email</span>
