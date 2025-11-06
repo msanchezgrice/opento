@@ -1214,9 +1214,37 @@ function initializeChat() {
       chatState.awaitingResponse = true;
       track('Chat Message Sent', { length: text.length });
 
+      // Detect if user is describing a project (budget, timeline, need)
+      const lower = text.toLowerCase();
+      const hasProjectDetails = (
+        (lower.includes('budget') || lower.includes('$') || lower.includes('k ') || lower.includes('need')) &&
+        (lower.length > 30) // Substantial message
+      );
+
       const response = await generateResponse(text);
       chatState.awaitingResponse = false;
-      addBotMessage(response, false);
+      
+      // If user is sharing project details, offer to open intro form
+      if (hasProjectDetails && !lower.match(/^(yes|yeah|sure|okay|ok)$/i)) {
+        addBotMessage(response, false);
+        setTimeout(() => {
+          const buttonMsg = document.createElement('div');
+          buttonMsg.className = 'chat-message bot';
+          buttonMsg.innerHTML = `
+            <div class="avatar">${agent?.avatar_initials || 'AG'}</div>
+            <div class="bubble">
+              Perfect! Ready to send this as an official intro request?<br><br>
+              <button class="btn primary" style="padding: 10px 20px;" onclick="document.getElementById('chatModal').style.display='none'; document.getElementById('introModal').style.display='flex'; const name=document.getElementById('introName'); if(name){name.focus();}">
+                Send Intro Request
+              </button>
+            </div>
+          `;
+          chatMessages.appendChild(buttonMsg);
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, 1200);
+      } else {
+        addBotMessage(response, false);
+      }
     };
 
     chatSend.addEventListener('click', ()=> sendMessage(chatInput.value));
