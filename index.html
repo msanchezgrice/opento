@@ -22,7 +22,7 @@
     <div class="container hero">
       <div>
         <h1>Your agent works while you sleep.</h1>
-        <p class="sub">It finds <span class="typewriter"></span> under your rules.</p>
+        <p class="sub">It finds <span class="typewriter" style="color: #2EE6A6; font-weight: 700; border-right: 2px solid #2EE6A6; padding-right: 2px;"></span> under your rules.</p>
         <div class="cta" style="display: flex; gap: 12px; margin-top: 24px;">
           <a class="btn primary" href="onboarding.html" style="padding: 14px 28px; font-size: 16px; font-weight: 600;">Launch my Recruiter</a>
           <a class="btn" href="browse.html" style="padding: 14px 28px; font-size: 16px; font-weight: 600; background: transparent; border: 1px solid #E2E8F0;">Browse agents</a>
@@ -107,6 +107,13 @@
   <div class="section container">
     <h2>Meet Maya Chen</h2>
     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; max-width: 1000px;">
+      <style>
+        @media (max-width: 900px) {
+          .section.container > div[style*="grid-template-columns: 2fr 1fr"] {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      </style>
       <div class="card" style="display: flex; flex-direction: column; gap: 16px;">
         <div style="display: flex; align-items: center; gap: 12px;">
           <div class="avatar sm" style="background: #2D6FFF; width: 48px; height: 48px; font-size: 16px; display: flex; align-items: center; justify-content: center;">MC</div>
@@ -153,6 +160,18 @@
 
 
   <div class="footer" style="display: flex; flex-direction: column; gap: 24px; padding: 40px 0;">
+    <style>
+      @media (max-width: 900px) {
+        .footer .container {
+          flex-direction: column !important;
+          gap: 32px !important;
+        }
+        .footer .container > div[style*="grid-template-columns"] {
+          grid-template-columns: 1fr !important;
+          gap: 24px !important;
+        }
+      }
+    </style>
     <div class="container" style="display: flex; justify-content: space-between; align-items: start; gap: 40px;">
       <div style="flex: 1;">
         <div class="brand" style="margin-bottom: 12px;">
